@@ -188,3 +188,9 @@ textarea.input { min-height: 120px; resize: vertical; line-height: 1.5; }
 .status-SHORTLISTED { background: var(--mint); }
 .status-SELECTED { background: var(--mint); }
 .status-WITHDRAWN { background: var(--white); color: var(--muted); }
+
+/* ---------- Step 9: filters ---------- */
+.filter-bar { display: flex; gap: 16px; align-items: flex-end; flex-wrap: wrap; }
+.filter-bar .field { margin-bottom: 0; }
+.filter-bar .input { min-width: 180px; }
+.btn-mint { background: var(--mint); }

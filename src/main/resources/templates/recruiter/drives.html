@@ -52,6 +52,10 @@
                 <div class="note" th:if="${d.status.name() == 'PENDING'}">Waiting for the placement officer to approve this drive.</div>
                 <div class="note" th:if="${d.status.name() == 'REJECTED'}"
                      th:text="'Rejected' + (${d.rejectionReason != null} ? ': ' + ${d.rejectionReason} : '.')">Rejected</div>
+
+                <div class="form-actions" th:if="${d.status.name() == 'APPROVED'}">
+                    <a class="btn btn-sm btn-mint" th:href="@{/recruiter/drives/{id}/applicants(id=${d.id})}">View applicants</a>
+                </div>
             </div>
         </div>
 

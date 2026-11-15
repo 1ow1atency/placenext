@@ -17,9 +17,13 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     List<Application> findByDriveOrderByAppliedAtDesc(Drive drive);
 
+    List<Application> findByDriveAndStatusNotOrderByAppliedAtDesc(Drive drive, ApplicationStatus status);
+
     long countByStudent(StudentProfile student);
 
     long countByStudentAndStatus(StudentProfile student, ApplicationStatus status);
 
     long countByDrive(Drive drive);
+
+    long countByDriveAndStatusNot(Drive drive, ApplicationStatus status);
 }

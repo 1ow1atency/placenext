@@ -36,7 +36,6 @@
         <div class="nav-label">RECRUITER</div>
         <a th:href="@{/recruiter/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
         <a th:href="@{/recruiter/drives}" th:classappend="${active == 'drives'} ? 'active'">My drives</a>
-        <a href="#">Applicants <span class="soon">SOON</span></a>
     </th:block>
 
     <th:block th:if="${role == 'ADMIN'}">

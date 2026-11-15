@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Applicants')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'RECRUITER')}"></nav>
+    <main class="main">
+
+        <p><a th:href="@{/recruiter/drives}">← My drives</a></p>
+
+        <div class="page-head">
+            <div class="page-title">
+                <h1 th:text="'Applicants: ' + ${drive.title}">Applicants</h1>
+                <p th:text="${totalApplicants} + ' total applicant(s) · ' + ${drive.type.label} + ' · apply by ' + ${#temporals.format(drive.deadline, 'dd MMM yyyy')}">Info</p>
+            </div>
+            <a class="btn btn-mint"
+               th:href="@{/recruiter/drives/{id}/applicants/export(id=${drive.id}, status=${statusFilter}, minCgpa=${minCgpaFilter})}">⬇ Download CSV</a>
+        </div>
+
+        <div class="window">
+            <div class="window-bar yellow"><span>FILTERS.CFG</span></div>
+            <div class="window-body">
+                <form th:action="@{/recruiter/drives/{id}/applicants(id=${drive.id})}" method="get" class="filter-bar">
+                    <div class="field">
+                        <label for="status">Status</label>
+                        <select class="input" id="status" name="status">
+                            <option value="">All</option>
+                            <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.label}"
+                                    th:selected="${s.name() == statusFilter}">Status</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="minCgpa">Min CGPA</label>
+                        <input class="input" type="number" step="0.01" min="0" max="10" id="minCgpa" name="minCgpa"
+                               th:value="${minCgpaFilter}" placeholder="e.g. 7.5">
+                    </div>
+                    <div class="field">
+                        <button type="submit" class="btn btn-primary">Apply filters</button>
+                        <a class="btn" th:href="@{/recruiter/drives/{id}/applicants(id=${drive.id})}">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar mint">
+                <span>APPLICANTS.DAT</span>
+                <span class="badge" th:text="${#lists.size(applications)} + ' shown'">0 shown</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(applications)}">
+                    <div class="empty-icon">📭</div>
+                    <strong>No applicants to show</strong>
+                    <p>Applications appear here as eligible students apply.</p>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(applications)}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th><th>Roll no</th><th>Branch</th><th>CGPA</th><th>Backlogs</th>
+                            <th>Phone</th><th>Applied</th><th>Status</th><th>Resume</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a : ${applications}">
+                            <td>
+                                <strong th:text="${a.student.user.fullName}">Name</strong><br>
+                                <span class="hint" th:text="${a.student.user.email}">email</span>
+                            </td>
+                            <td th:text="${a.student.rollNo}">Roll</td>
+                            <td th:text="${a.student.branch.name()}">CSE</td>
+                            <td th:text="${a.student.cgpa}">8.0</td>
+                            <td th:text="${a.student.activeBacklogs}">0</td>
+                            <td th:text="${a.student.phone}">Phone</td>
+                            <td th:text="${#temporals.format(a.appliedAt, 'dd MMM yyyy')}">Date</td>
+                            <td><span class="badge" th:classappend="'status-' + ${a.status}" th:text="${a.status.label}">Status</span></td>
+                            <td>
+                                <a class="btn btn-sm" target="_blank"
+                                   th:href="@{/recruiter/drives/{d}/applicants/{a}/resume(d=${drive.id}, a=${a.id})}">View</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>
