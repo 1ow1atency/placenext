@@ -20,17 +20,31 @@
         <div class="stats">
             <div class="stat"><div class="stat-label">Students</div><div class="stat-value" th:text="${studentCount}">0</div></div>
             <div class="stat mint"><div class="stat-label">Recruiters</div><div class="stat-value" th:text="${recruiterCount}">0</div></div>
-            <div class="stat yellow"><div class="stat-label">Drives</div><div class="stat-value">0</div></div>
-            <div class="stat"><div class="stat-label">Placed</div><div class="stat-value">0</div></div>
+            <div class="stat yellow"><div class="stat-label">Drives</div><div class="stat-value" th:text="${driveCount}">0</div></div>
+            <div class="stat"><div class="stat-label">Awaiting approval</div><div class="stat-value" th:text="${pendingCount}">0</div></div>
         </div>
 
         <div class="window">
-            <div class="window-bar mint"><span>PENDING_APPROVALS.DAT</span></div>
+            <div class="window-bar mint">
+                <span>PENDING_APPROVALS.DAT</span>
+                <a class="btn btn-sm" th:href="@{/admin/drives}">Review drives</a>
+            </div>
             <div class="window-body">
-                <div class="empty">
+                <div class="empty" th:if="${#lists.isEmpty(pendingDrives)}">
                     <div class="empty-icon">✅</div>
                     <strong>Nothing waiting for approval</strong>
                     <p>Drives posted by recruiters will appear here for review.</p>
+                </div>
+                <div class="drive-list" th:unless="${#lists.isEmpty(pendingDrives)}">
+                    <div class="drive-card" th:each="d : ${pendingDrives}">
+                        <div class="drive-top">
+                            <div>
+                                <p class="drive-title" th:text="${d.title}">Title</p>
+                                <div class="drive-company" th:text="${d.companyName} + ' · ' + ${d.compensation}">Company</div>
+                            </div>
+                            <a class="btn btn-sm btn-mint" th:href="@{/admin/drives}">Review</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

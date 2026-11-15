@@ -33,19 +33,38 @@
         </div>
 
         <div class="stats">
-            <div class="stat"><div class="stat-label">Eligible drives</div><div class="stat-value">0</div></div>
+            <div class="stat"><div class="stat-label">Eligible drives</div><div class="stat-value" th:text="${eligibleCount}">0</div></div>
             <div class="stat mint"><div class="stat-label">Applications</div><div class="stat-value">0</div></div>
             <div class="stat yellow"><div class="stat-label">Shortlisted</div><div class="stat-value">0</div></div>
             <div class="stat"><div class="stat-label">Offers</div><div class="stat-value">0</div></div>
         </div>
 
         <div class="window">
-            <div class="window-bar mint"><span>UPCOMING_DRIVES.DAT</span></div>
+            <div class="window-bar mint">
+                <span>UPCOMING_DRIVES.DAT</span>
+                <a class="btn btn-sm" th:href="@{/student/drives}">See all</a>
+            </div>
             <div class="window-body">
-                <div class="empty">
+                <div class="empty" th:if="${#lists.isEmpty(upcoming)}">
                     <div class="empty-icon">💼</div>
-                    <strong>No drives yet</strong>
-                    <p>When companies post drives you're eligible for, they'll show up here.</p>
+                    <strong>No drives you're eligible for yet</strong>
+                    <p>Open <a th:href="@{/student/drives}">Drives</a> to see every open drive and why you might not qualify.</p>
+                </div>
+
+                <div class="drive-list" th:unless="${#lists.isEmpty(upcoming)}">
+                    <div class="drive-card" th:each="e : ${upcoming}" th:with="d=${e.drive}">
+                        <div class="drive-top">
+                            <div>
+                                <p class="drive-title" th:text="${d.title}">Title</p>
+                                <div class="drive-company" th:text="${d.companyName} + ' · ' + ${d.type.label}">Company</div>
+                            </div>
+                            <a class="btn btn-sm btn-primary" th:href="@{/student/drives/{id}(id=${d.id})}">View</a>
+                        </div>
+                        <div class="drive-meta">
+                            <span>💰 <strong th:text="${d.compensation}">—</strong></span>
+                            <span>📅 Apply by <strong th:text="${#temporals.format(d.deadline, 'dd MMM yyyy')}">date</strong></span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

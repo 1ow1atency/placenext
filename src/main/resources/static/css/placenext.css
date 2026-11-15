@@ -142,3 +142,44 @@ select.input { cursor: pointer; }
 .table td { padding: 10px 12px; border-bottom: 1px solid var(--pink-soft); }
 .table tr:hover td { background: var(--pink-bg); }
 @media (max-width: 860px) { .form-grid { grid-template-columns: 1fr; } }
+
+/* ---------- Module 2: drives ---------- */
+textarea.input { min-height: 120px; resize: vertical; line-height: 1.5; }
+.form-grid .full { grid-column: 1 / -1; }
+.section-label { font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--plum);
+    margin: 8px 0 12px; padding-bottom: 6px; border-bottom: 2px dashed var(--pink); }
+.check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.check { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 2px solid var(--plum);
+    background: var(--pink-bg); cursor: pointer; font-size: 13px; }
+.check input { accent-color: var(--plum-mid); width: 16px; height: 16px; }
+.check:has(input:checked) { background: var(--mint-soft); }
+.radio-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+.page-head .page-title { margin-bottom: 0; }
+
+/* Status badges */
+.status-PENDING { background: var(--yellow); }
+.status-APPROVED { background: var(--mint); }
+.status-REJECTED { background: var(--red-soft); color: var(--red); border-color: var(--red); }
+.status-CLOSED { background: var(--white); color: var(--muted); }
+
+/* Drive cards */
+.drive-list { display: grid; gap: 16px; }
+.drive-card { background: var(--white); border: var(--border); box-shadow: var(--shadow); padding: 16px 18px; }
+.drive-card.dim { background: var(--pink-bg); box-shadow: 2px 2px 0 var(--plum); }
+.drive-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.drive-title { font-size: 16px; font-weight: 700; color: var(--plum); margin: 0; }
+.drive-company { font-size: 13px; color: var(--muted); }
+.drive-meta { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; margin-top: 10px; }
+.drive-meta strong { color: var(--plum); }
+.reasons { margin: 10px 0 0; padding: 8px 12px; background: var(--red-soft); border-left: 4px solid var(--red);
+    font-size: 12px; color: var(--red); list-style: none; }
+.note { margin-top: 10px; font-size: 12px; padding: 8px 12px; background: var(--yellow-soft); border-left: 4px solid var(--plum); }
+.inline-form { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 0; }
+.inline-form .input { padding: 6px 10px; font-size: 12px; width: auto; min-width: 180px; }
+.btn-danger { background: var(--red-soft); color: var(--red); border-color: var(--red); box-shadow: 2px 2px 0 var(--red); }
+.kv { display: grid; grid-template-columns: 160px 1fr; gap: 8px 16px; font-size: 13px; }
+.kv dt { font-weight: 700; color: var(--plum); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding-top: 2px; }
+.kv dd { margin: 0; }
+.pre-wrap { white-space: pre-wrap; }
+@media (max-width: 860px) { .kv { grid-template-columns: 1fr; } }

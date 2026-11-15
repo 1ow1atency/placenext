@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('New drive')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'RECRUITER')}"></nav>
+    <main class="main">
+
+        <div class="page-title">
+            <h1>New drive</h1>
+            <p th:text="'Posting for ' + ${recruiter.companyName} + '. The placement officer reviews every drive before students see it.'">Posting</p>
+        </div>
+
+        <form th:action="@{/recruiter/drives}" th:object="${form}" method="post">
+
+            <div class="window">
+                <div class="window-bar"><span>DRIVE_DETAILS.CFG</span></div>
+                <div class="window-body">
+                    <div class="form-grid">
+                        <div class="field full">
+                            <label for="title">Job title / role</label>
+                            <input class="input" type="text" th:field="*{title}" placeholder="e.g. Software Engineer Intern">
+                            <span class="field-error" th:errors="*{title}"></span>
+                        </div>
+
+                        <div class="field full">
+                            <label>Type</label>
+                            <div class="radio-row">
+                                <label class="check" th:each="t : ${types}">
+                                    <input type="radio" th:field="*{type}" th:value="${t}">
+                                    <span th:text="${t.label}">Type</span>
+                                </label>
+                            </div>
+                            <span class="field-error" th:errors="*{type}"></span>
+                        </div>
+
+                        <div class="field" id="ctc-field">
+                            <label for="ctcLpa">Package (LPA)</label>
+                            <input class="input" type="number" step="0.01" min="0" th:field="*{ctcLpa}" placeholder="e.g. 12">
+                            <span class="field-error" th:errors="*{ctcLpa}"></span>
+                        </div>
+                        <div class="field" id="stipend-field">
+                            <label for="stipendPerMonth">Stipend (₹ per month)</label>
+                            <input class="input" type="number" min="0" th:field="*{stipendPerMonth}" placeholder="e.g. 40000">
+                            <span class="field-error" th:errors="*{stipendPerMonth}"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="location">Location</label>
+                            <input class="input" type="text" th:field="*{location}" placeholder="e.g. Bengaluru / Remote">
+                            <span class="field-error" th:errors="*{location}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="deadline">Apply by</label>
+                            <input class="input" type="date" th:field="*{deadline}">
+                            <span class="field-error" th:errors="*{deadline}"></span>
+                        </div>
+
+                        <div class="field full">
+                            <label for="description">Description</label>
+                            <textarea class="input" th:field="*{description}"
+                                      placeholder="Responsibilities, skills you're looking for, selection process…"></textarea>
+                            <span class="field-error" th:errors="*{description}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window">
+                <div class="window-bar yellow"><span>ELIGIBILITY_RULES.CFG</span></div>
+                <div class="window-body">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="minCgpa">Minimum CGPA</label>
+                            <input class="input" type="number" step="0.01" min="0" max="10" th:field="*{minCgpa}">
+                            <span class="field-error" th:errors="*{minCgpa}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="maxBacklogs">Max active backlogs</label>
+                            <input class="input" type="number" min="0" th:field="*{maxBacklogs}">
+                            <span class="field-error" th:errors="*{maxBacklogs}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="eligibleBatch">Passing year (batch)</label>
+                            <input class="input" type="number" min="2020" max="2035" th:field="*{eligibleBatch}">
+                            <span class="field-error" th:errors="*{eligibleBatch}"></span>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>Allowed branches
+                            <button type="button" class="btn btn-sm" style="margin-left:8px" onclick="toggleAllBranches()">Select all</button>
+                        </label>
+                        <div class="check-grid">
+                            <label class="check" th:each="b : ${branches}">
+                                <input type="checkbox" class="branch-box" th:field="*{allowedBranches}" th:value="${b}">
+                                <span th:text="${b.label}">Branch</span>
+                            </label>
+                        </div>
+                        <span class="field-error" th:errors="*{allowedBranches}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Submit for approval</button>
+                <a class="btn" th:href="@{/recruiter/drives}">Cancel</a>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script>
+    // Show the Package field for full-time, the Stipend field for internships
+    function syncPayFields() {
+        var picked = document.querySelector('input[name="type"]:checked');
+        var isIntern = picked && picked.value === 'INTERNSHIP';
+        document.getElementById('ctc-field').style.display = isIntern ? 'none' : '';
+        document.getElementById('stipend-field').style.display = isIntern ? '' : 'none';
+    }
+    document.querySelectorAll('input[name="type"]').forEach(function (r) {
+        r.addEventListener('change', syncPayFields);
+    });
+    syncPayFields();
+
+    // "Select all" toggles every branch checkbox
+    function toggleAllBranches() {
+        var boxes = document.querySelectorAll('.branch-box');
+        var allOn = Array.prototype.every.call(boxes, function (b) { return b.checked; });
+        boxes.forEach(function (b) { b.checked = !allOn; });
+    }
+</script>
+</body>
+</html>

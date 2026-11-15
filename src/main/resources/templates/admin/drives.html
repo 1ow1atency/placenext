@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Drives')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'ADMIN')}"></nav>
+    <main class="main">
+
+        <div class="page-title">
+            <h1>Drives</h1>
+            <p>Review drives posted by recruiters. Only approved drives are visible to students.</p>
+        </div>
+
+        <div class="alert alert-success" th:if="${message}" th:text="${message}">Done</div>
+
+        <!-- Pending approvals -->
+        <div class="window">
+            <div class="window-bar yellow">
+                <span>PENDING_APPROVALS.DAT</span>
+                <span class="badge" th:text="${#lists.size(pending)} + ' waiting'">0 waiting</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(pending)}">
+                    <div class="empty-icon">✅</div>
+                    <strong>Nothing waiting for approval</strong>
+                    <p>New drives from recruiters will appear here.</p>
+                </div>
+
+                <div class="drive-list" th:unless="${#lists.isEmpty(pending)}">
+                    <div class="drive-card" th:each="d : ${pending}">
+                        <div class="drive-top">
+                            <div>
+                                <p class="drive-title" th:text="${d.title}">Title</p>
+                                <div class="drive-company"
+                                     th:text="${d.companyName} + ' · ' + ${d.type.label} + (${d.location != null} ? ' · ' + ${d.location} : '')">Company</div>
+                            </div>
+                            <span class="badge status-PENDING">Pending</span>
+                        </div>
+
+                        <div class="drive-meta">
+                            <span>💰 <strong th:text="${d.compensation}">—</strong></span>
+                            <span>📅 Apply by <strong th:text="${#temporals.format(d.deadline, 'dd MMM yyyy')}">date</strong></span>
+                            <span>🎓 Batch <strong th:text="${d.eligibleBatch}">2027</strong></span>
+                            <span>📊 CGPA ≥ <strong th:text="${d.minCgpa}">6.0</strong></span>
+                            <span>📚 Backlogs ≤ <strong th:text="${d.maxBacklogs}">0</strong></span>
+                            <span>🏷 <strong th:text="${d.branchCodes}">CSE</strong></span>
+                        </div>
+
+                        <p class="pre-wrap" style="font-size:13px; margin:12px 0 0"
+                           th:if="${d.description != null}" th:text="${d.description}">Description</p>
+
+                        <div class="form-actions">
+                            <form th:action="@{/admin/drives/{id}/approve(id=${d.id})}" method="post" class="inline-form">
+                                <button type="submit" class="btn btn-sm btn-mint">✓ Approve</button>
+                            </form>
+                            <form th:action="@{/admin/drives/{id}/reject(id=${d.id})}" method="post" class="inline-form">
+                                <input class="input" type="text" name="reason" placeholder="Reason for rejecting (optional)">
+                                <button type="submit" class="btn btn-sm btn-danger">✕ Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All drives -->
+        <div class="window">
+            <div class="window-bar mint">
+                <span>ALL_DRIVES.DAT</span>
+                <span class="badge" th:text="${#lists.size(drives)} + ' total'">0 total</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(drives)}">
+                    <div class="empty-icon">📋</div>
+                    <strong>No drives yet</strong>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(drives)}">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Drive</th><th>Company</th><th>Type</th><th>Pay</th><th>Deadline</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="d : ${drives}">
+                            <td><strong th:text="${d.title}">Title</strong></td>
+                            <td th:text="${d.companyName}">Company</td>
+                            <td th:text="${d.type.label}">Type</td>
+                            <td th:text="${d.compensation}">Pay</td>
+                            <td th:text="${#temporals.format(d.deadline, 'dd MMM yyyy')}">Date</td>
+                            <td><span class="badge" th:classappend="'status-' + ${d.status}" th:text="${d.status.label}">Status</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead(${drive.title})}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'STUDENT')}"></nav>
+    <main class="main">
+
+        <p><a th:href="@{/student/drives}">← All drives</a></p>
+
+        <div class="window">
+            <div class="window-bar">
+                <span>DRIVE_INFO.DAT</span>
+                <span class="badge mint" th:if="${#lists.isEmpty(reasons)}">Eligible</span>
+                <span class="badge red" th:unless="${#lists.isEmpty(reasons)}">Not eligible</span>
+            </div>
+            <div class="window-body">
+                <h1 th:text="${drive.title}">Title</h1>
+                <p class="drive-company"
+                   th:text="${drive.companyName} + ' · ' + ${drive.type.label} + (${drive.location != null} ? ' · ' + ${drive.location} : '')">Company</p>
+
+                <dl class="kv" style="margin-top:20px">
+                    <dt th:text="${drive.type.name() == 'INTERNSHIP'} ? 'Stipend' : 'Package'">Pay</dt>
+                    <dd><strong th:text="${drive.compensation}">—</strong></dd>
+
+                    <dt>Apply by</dt>
+                    <dd th:text="${#temporals.format(drive.deadline, 'EEEE, dd MMM yyyy')}">date</dd>
+
+                    <dt>Recruiter</dt>
+                    <dd th:text="${drive.recruiter.user.fullName} + (${drive.recruiter.designation != null} ? ', ' + ${drive.recruiter.designation} : '')">Name</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="window" th:if="${drive.description != null}">
+            <div class="window-bar mint"><span>JOB_DESCRIPTION.TXT</span></div>
+            <div class="window-body">
+                <p class="pre-wrap" style="margin:0" th:text="${drive.description}">Description</p>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar yellow"><span>ELIGIBILITY_CHECK.EXE</span></div>
+            <div class="window-body">
+                <dl class="kv">
+                    <dt>Branches</dt>  <dd th:text="${drive.branchCodes}">CSE</dd>
+                    <dt>Batch</dt>     <dd th:text="${drive.eligibleBatch}">2027</dd>
+                    <dt>Min CGPA</dt>  <dd th:text="${drive.minCgpa}">6.0</dd>
+                    <dt>Max backlogs</dt><dd th:text="${drive.maxBacklogs}">0</dd>
+                </dl>
+
+                <div class="alert alert-success" style="margin:16px 0 0" th:if="${#lists.isEmpty(reasons)}">
+                    ✓ You meet every requirement for this drive.
+                </div>
+                <ul class="reasons" th:unless="${#lists.isEmpty(reasons)}">
+                    <li th:each="r : ${reasons}" th:text="'✕ ' + ${r}">Reason</li>
+                </ul>
+
+                <div class="form-actions" style="margin-top:16px">
+                    <button class="btn btn-primary" disabled style="opacity:.5; cursor:not-allowed">Apply</button>
+                    <span class="hint" style="margin:0">Applications open in the next update (step 8).</span>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

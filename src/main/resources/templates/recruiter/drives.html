@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('My drives')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'RECRUITER')}"></nav>
+    <main class="main">
+
+        <div class="page-head">
+            <div class="page-title">
+                <h1>My drives</h1>
+                <p th:text="${recruiter.companyName} + ' · placement drives you have posted'">Company</p>
+            </div>
+            <a class="btn btn-primary" th:href="@{/recruiter/drives/new}">+ New drive</a>
+        </div>
+
+        <div class="alert alert-success" th:if="${created}"
+             th:text="'Drive “' + ${created} + '” submitted. The placement officer will review it before students can see it.'">Created</div>
+
+        <div class="window" th:if="${#lists.isEmpty(drives)}">
+            <div class="window-bar mint"><span>MY_DRIVES.DAT</span></div>
+            <div class="window-body">
+                <div class="empty">
+                    <div class="empty-icon">📋</div>
+                    <strong>No drives posted yet</strong>
+                    <p>Create your first drive. It goes live once the placement officer approves it.</p>
+                    <a class="btn btn-yellow" th:href="@{/recruiter/drives/new}">Create a drive</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="drive-list" th:unless="${#lists.isEmpty(drives)}">
+            <div class="drive-card" th:each="d : ${drives}">
+                <div class="drive-top">
+                    <div>
+                        <p class="drive-title" th:text="${d.title}">Title</p>
+                        <div class="drive-company" th:text="${d.type.label} + (${d.location != null} ? ' · ' + ${d.location} : '')">Type</div>
+                    </div>
+                    <span class="badge" th:classappend="'status-' + ${d.status}" th:text="${d.status.label}">Status</span>
+                </div>
+
+                <div class="drive-meta">
+                    <span>💰 <strong th:text="${d.compensation}">—</strong></span>
+                    <span>📅 Apply by <strong th:text="${#temporals.format(d.deadline, 'dd MMM yyyy')}">date</strong></span>
+                    <span>🎓 Batch <strong th:text="${d.eligibleBatch}">2027</strong></span>
+                    <span>📊 CGPA ≥ <strong th:text="${d.minCgpa}">6.0</strong></span>
+                    <span>📚 Backlogs ≤ <strong th:text="${d.maxBacklogs}">0</strong></span>
+                    <span>🏷 <strong th:text="${d.branchCodes}">CSE</strong></span>
+                </div>
+
+                <div class="note" th:if="${d.status.name() == 'PENDING'}">Waiting for the placement officer to approve this drive.</div>
+                <div class="note" th:if="${d.status.name() == 'REJECTED'}"
+                     th:text="'Rejected' + (${d.rejectionReason != null} ? ': ' + ${d.rejectionReason} : '.')">Rejected</div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

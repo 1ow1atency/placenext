@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Drives')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'STUDENT')}"></nav>
+    <main class="main">
+
+        <div class="page-title">
+            <h1>Placement drives</h1>
+            <p>Open drives this season, checked against your profile.</p>
+        </div>
+
+        <div class="alert alert-info" th:if="${profile == null or !profile.complete}">
+            Your profile is incomplete, so you can't apply yet.
+            <a th:href="@{/student/profile}">Complete your profile →</a>
+        </div>
+
+        <!-- Eligible -->
+        <div class="window">
+            <div class="window-bar mint">
+                <span>ELIGIBLE_FOR_YOU.DAT</span>
+                <span class="badge" th:text="${#lists.size(eligible)}">0</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(eligible)}">
+                    <div class="empty-icon">🔍</div>
+                    <strong>No drives match your profile right now</strong>
+                    <p>Check back soon. New drives are added through the season.</p>
+                </div>
+
+                <div class="drive-list" th:unless="${#lists.isEmpty(eligible)}">
+                    <div class="drive-card" th:each="e : ${eligible}" th:with="d=${e.drive}">
+                        <div class="drive-top">
+                            <div>
+                                <p class="drive-title" th:text="${d.title}">Title</p>
+                                <div class="drive-company"
+                                     th:text="${d.companyName} + ' · ' + ${d.type.label} + (${d.location != null} ? ' · ' + ${d.location} : '')">Company</div>
+                            </div>
+                            <span class="badge mint">Eligible</span>
+                        </div>
+                        <div class="drive-meta">
+                            <span>💰 <strong th:text="${d.compensation}">—</strong></span>
+                            <span>📅 Apply by <strong th:text="${#temporals.format(d.deadline, 'dd MMM yyyy')}">date</strong></span>
+                            <span>📊 CGPA ≥ <strong th:text="${d.minCgpa}">6.0</strong></span>
+                        </div>
+                        <div class="form-actions">
+                            <a class="btn btn-sm btn-primary" th:href="@{/student/drives/{id}(id=${d.id})}">View details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Not eligible -->
+        <div class="window" th:unless="${#lists.isEmpty(notEligible)}">
+            <div class="window-bar">
+                <span>NOT_ELIGIBLE.DAT</span>
+                <span class="badge" th:text="${#lists.size(notEligible)}">0</span>
+            </div>
+            <div class="window-body">
+                <div class="drive-list">
+                    <div class="drive-card dim" th:each="e : ${notEligible}" th:with="d=${e.drive}">
+                        <div class="drive-top">
+                            <div>
+                                <p class="drive-title" th:text="${d.title}">Title</p>
+                                <div class="drive-company"
+                                     th:text="${d.companyName} + ' · ' + ${d.type.label} + (${d.location != null} ? ' · ' + ${d.location} : '')">Company</div>
+                            </div>
+                            <span class="badge red">Not eligible</span>
+                        </div>
+                        <div class="drive-meta">
+                            <span>💰 <strong th:text="${d.compensation}">—</strong></span>
+                            <span>📅 Apply by <strong th:text="${#temporals.format(d.deadline, 'dd MMM yyyy')}">date</strong></span>
+                        </div>
+                        <ul class="reasons">
+                            <li th:each="r : ${e.reasons}" th:text="'✕ ' + ${r}">Reason</li>
+                        </ul>
+                        <div class="form-actions">
+                            <a class="btn btn-sm" th:href="@{/student/drives/{id}(id=${d.id})}">View details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

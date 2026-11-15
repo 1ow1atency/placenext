@@ -17,23 +17,39 @@
                     <span class="badge mint" th:text="${recruiter.companyName}">Company</span>
                     <span th:if="${recruiter.designation != null}" th:text="' · ' + ${recruiter.designation}"></span>
                 </p>
-                <p>Post placement drives, review applicants and schedule rounds.</p>
+                <div class="form-actions">
+                    <a class="btn btn-sm btn-primary" th:href="@{/recruiter/drives/new}">+ New drive</a>
+                </div>
             </div>
         </div>
 
         <div class="stats">
-            <div class="stat"><div class="stat-label">Active drives</div><div class="stat-value">0</div></div>
+            <div class="stat"><div class="stat-label">Active drives</div><div class="stat-value" th:text="${activeCount}">0</div></div>
+            <div class="stat yellow"><div class="stat-label">Awaiting approval</div><div class="stat-value" th:text="${pendingCount}">0</div></div>
             <div class="stat mint"><div class="stat-label">Applicants</div><div class="stat-value">0</div></div>
-            <div class="stat yellow"><div class="stat-label">Shortlisted</div><div class="stat-value">0</div></div>
         </div>
 
         <div class="window">
-            <div class="window-bar mint"><span>MY_DRIVES.DAT</span></div>
+            <div class="window-bar mint">
+                <span>RECENT_DRIVES.DAT</span>
+                <a class="btn btn-sm" th:href="@{/recruiter/drives}">See all</a>
+            </div>
             <div class="window-body">
-                <div class="empty">
+                <div class="empty" th:if="${#lists.isEmpty(recentDrives)}">
                     <div class="empty-icon">📋</div>
                     <strong>No drives posted yet</strong>
-                    <p>Drive creation arrives in Module 2.</p>
+                    <p><a th:href="@{/recruiter/drives/new}">Create your first drive →</a></p>
+                </div>
+                <div class="drive-list" th:unless="${#lists.isEmpty(recentDrives)}">
+                    <div class="drive-card" th:each="d : ${recentDrives}">
+                        <div class="drive-top">
+                            <div>
+                                <p class="drive-title" th:text="${d.title}">Title</p>
+                                <div class="drive-company" th:text="${d.type.label} + ' · apply by ' + ${#temporals.format(d.deadline, 'dd MMM')}">Type</div>
+                            </div>
+                            <span class="badge" th:classappend="'status-' + ${d.status}" th:text="${d.status.label}">Status</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
