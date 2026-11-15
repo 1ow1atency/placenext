@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Dashboard')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('dashboard', 'STUDENT')}"></nav>
+    <main class="main">
+        <div class="window">
+            <div class="window-bar">
+                <span>WELCOME.EXE</span>
+                <span class="window-controls"><span></span><span></span></span>
+            </div>
+            <div class="window-body">
+                <h1 th:text="'Hi, ' + ${user.fullName} + '!'">Hi!</h1>
+                <p>Complete your profile so you can start applying to placement drives.</p>
+                <span class="badge yellow">Profile incomplete</span>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-label">Eligible drives</div><div class="stat-value">0</div></div>
+            <div class="stat mint"><div class="stat-label">Applications</div><div class="stat-value">0</div></div>
+            <div class="stat yellow"><div class="stat-label">Shortlisted</div><div class="stat-value">0</div></div>
+            <div class="stat"><div class="stat-label">Offers</div><div class="stat-value">0</div></div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar mint"><span>UPCOMING_DRIVES.DAT</span></div>
+            <div class="window-body">
+                <div class="empty">
+                    <div class="empty-icon">💼</div>
+                    <strong>No drives yet</strong>
+                    <p>When companies post drives you're eligible for, they'll show up here.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

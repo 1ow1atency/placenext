@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Dashboard')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('dashboard', 'RECRUITER')}"></nav>
+    <main class="main">
+        <div class="window">
+            <div class="window-bar">
+                <span>RECRUITER_CONSOLE.EXE</span>
+                <span class="window-controls"><span></span><span></span></span>
+            </div>
+            <div class="window-body">
+                <h1 th:text="'Welcome, ' + ${user.fullName}">Welcome</h1>
+                <p>Post placement drives, review applicants and schedule rounds.</p>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-label">Active drives</div><div class="stat-value">0</div></div>
+            <div class="stat mint"><div class="stat-label">Applicants</div><div class="stat-value">0</div></div>
+            <div class="stat yellow"><div class="stat-label">Shortlisted</div><div class="stat-value">0</div></div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar mint"><span>MY_DRIVES.DAT</span></div>
+            <div class="window-body">
+                <div class="empty">
+                    <div class="empty-icon">📋</div>
+                    <strong>No drives posted yet</strong>
+                    <p>Drive creation arrives in Module 2.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

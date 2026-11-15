@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Admin')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('dashboard', 'ADMIN')}"></nav>
+    <main class="main">
+        <div class="window">
+            <div class="window-bar yellow">
+                <span>TPO_CONTROL_PANEL.EXE</span>
+                <span class="window-controls"><span></span><span></span></span>
+            </div>
+            <div class="window-body">
+                <h1 th:text="'Hello, ' + ${user.fullName}">Hello</h1>
+                <p>Overview of this season's placements.</p>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-label">Students</div><div class="stat-value" th:text="${studentCount}">0</div></div>
+            <div class="stat mint"><div class="stat-label">Recruiters</div><div class="stat-value" th:text="${recruiterCount}">0</div></div>
+            <div class="stat yellow"><div class="stat-label">Drives</div><div class="stat-value">0</div></div>
+            <div class="stat"><div class="stat-label">Placed</div><div class="stat-value">0</div></div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar mint"><span>PENDING_APPROVALS.DAT</span></div>
+            <div class="window-body">
+                <div class="empty">
+                    <div class="empty-icon">✅</div>
+                    <strong>Nothing waiting for approval</strong>
+                    <p>Drives posted by recruiters will appear here for review.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

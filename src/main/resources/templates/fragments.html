@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="pageHead(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · PlaceNext'">PlaceNext</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/placenext.css}">
+</head>
+
+<body>
+
+<header th:fragment="statusbar" class="statusbar">
+    <a class="brand" th:href="@{/}"><span class="brand-mark">PN</span> PLACENEXT</a>
+    <div class="user">
+        <span><span class="dot"></span> <span class="email" th:text="${#authentication.name}">user</span></span>
+        <form th:action="@{/logout}" method="post" style="margin:0">
+            <button type="submit" class="btn btn-sm">Log out</button>
+        </form>
+    </div>
+</header>
+
+<nav th:fragment="sidenav(active, role)" class="sidenav">
+    <th:block th:if="${role == 'STUDENT'}">
+        <div class="nav-label">STUDENT</div>
+        <a th:href="@{/student/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a href="#">Drives <span class="soon">SOON</span></a>
+        <a href="#">My applications <span class="soon">SOON</span></a>
+        <a href="#">Profile <span class="soon">SOON</span></a>
+    </th:block>
+
+    <th:block th:if="${role == 'RECRUITER'}">
+        <div class="nav-label">RECRUITER</div>
+        <a th:href="@{/recruiter/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a href="#">My drives <span class="soon">SOON</span></a>
+        <a href="#">Applicants <span class="soon">SOON</span></a>
+    </th:block>
+
+    <th:block th:if="${role == 'ADMIN'}">
+        <div class="nav-label">PLACEMENT OFFICER</div>
+        <a th:href="@{/admin/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a href="#">Drives <span class="soon">SOON</span></a>
+        <a href="#">Students <span class="soon">SOON</span></a>
+        <a href="#">Recruiters <span class="soon">SOON</span></a>
+        <a href="#">Reports <span class="soon">SOON</span></a>
+    </th:block>
+</nav>
+
+</body>
+</html>

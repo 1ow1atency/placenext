@@ -1,19 +1,45 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Log in · PlaceNext</title></head>
+<head th:replace="~{fragments :: pageHead('Log in')}"></head>
 <body>
-<h1>Log in</h1>
+<div class="auth-page">
+    <div class="auth-wrap">
+        <div class="auth-brand">
+            <h1>PLACENEXT</h1>
+            <p>Campus placement &amp; internship portal</p>
+        </div>
 
-<p th:if="${param.error}">Wrong email or password.</p>
-<p th:if="${param.logout}">You've been logged out.</p>
-<p th:if="${param.registered}">Account created. Log in below.</p>
+        <div class="window">
+            <div class="window-bar">
+                <span>AUTH_MANAGER.EXE</span>
+                <span class="window-controls"><span></span><span></span></span>
+            </div>
+            <div class="window-body">
+                <div class="tabs">
+                    <a class="tab active" th:href="@{/login}">LOG IN</a>
+                    <a class="tab" th:href="@{/register}">REGISTER</a>
+                </div>
 
-<form th:action="@{/login}" method="post">
-    <label>Email <input type="email" name="email" required></label><br>
-    <label>Password <input type="password" name="password" required></label><br>
-    <button type="submit">Log in</button>
-</form>
+                <div class="alert alert-error" th:if="${param.error}">Wrong email or password.</div>
+                <div class="alert alert-info" th:if="${param.logout}">You've been logged out.</div>
+                <div class="alert alert-success" th:if="${param.registered}">Account created! Log in below.</div>
 
-<p>New student? <a th:href="@{/register}">Create an account</a></p>
+                <form th:action="@{/login}" method="post">
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input class="input" type="email" id="email" name="email" placeholder="you@college.edu" required autofocus>
+                    </div>
+                    <div class="field">
+                        <label for="password">Password</label>
+                        <input class="input" type="password" id="password" name="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">Log in</button>
+                </form>
+
+                <p class="auth-foot">New student? <a th:href="@{/register}">Create an account</a></p>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
