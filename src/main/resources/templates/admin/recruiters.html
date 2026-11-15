@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Recruiters')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('recruiters', 'ADMIN')}"></nav>
+    <main class="main">
+        <div class="page-title">
+            <h1>Recruiters</h1>
+            <p>Create accounts for company recruiters. Share the temporary password with them directly.</p>
+        </div>
+
+        <div class="alert alert-success" th:if="${created}"
+             th:text="'Recruiter account created for ' + ${created} + '.'">Created</div>
+
+        <div class="window">
+            <div class="window-bar yellow"><span>NEW_RECRUITER.EXE</span></div>
+            <div class="window-body">
+                <form th:action="@{/admin/recruiters}" th:object="${form}" method="post">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="fullName">Recruiter name</label>
+                            <input class="input" type="text" th:field="*{fullName}" placeholder="e.g. Priya Sharma">
+                            <span class="field-error" th:errors="*{fullName}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="email">Work email</label>
+                            <input class="input" type="email" th:field="*{email}" placeholder="hr@company.com">
+                            <span class="field-error" th:errors="*{email}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="companyName">Company</label>
+                            <input class="input" type="text" th:field="*{companyName}" placeholder="e.g. Acme Technologies">
+                            <span class="field-error" th:errors="*{companyName}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="designation">Designation <span class="hint" style="display:inline">(optional)</span></label>
+                            <input class="input" type="text" th:field="*{designation}" placeholder="e.g. Talent Acquisition Lead">
+                            <span class="field-error" th:errors="*{designation}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="tempPassword">Temporary password</label>
+                            <input class="input" type="text" th:field="*{tempPassword}" placeholder="At least 8 characters" autocomplete="off">
+                            <span class="field-error" th:errors="*{tempPassword}"></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create recruiter</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar mint">
+                <span>RECRUITERS.DAT</span>
+                <span class="badge" th:text="${#lists.size(recruiters)} + ' total'">0 total</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(recruiters)}">
+                    <div class="empty-icon">🏢</div>
+                    <strong>No recruiters yet</strong>
+                    <p>Create the first one using the form above.</p>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(recruiters)}">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Name</th><th>Email</th><th>Company</th><th>Designation</th><th>Added</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="r : ${recruiters}">
+                            <td th:text="${r.user.fullName}">Name</td>
+                            <td th:text="${r.user.email}">email</td>
+                            <td><span class="badge mint" th:text="${r.companyName}">Company</span></td>
+                            <td th:text="${r.designation != null} ? ${r.designation} : '—'">—</td>
+                            <td th:text="${#temporals.format(r.user.createdAt, 'dd MMM yyyy')}">date</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

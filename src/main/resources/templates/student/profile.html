@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('My profile')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('profile', 'STUDENT')}"></nav>
+    <main class="main">
+        <div class="page-title">
+            <h1>My profile</h1>
+            <p>Recruiters see these details when you apply, so keep them accurate.</p>
+        </div>
+
+        <div class="alert alert-success" th:if="${saved}">Profile saved!</div>
+
+        <form th:action="@{/student/profile}" th:object="${form}" method="post" enctype="multipart/form-data">
+
+            <div class="window">
+                <div class="window-bar">
+                    <span>STUDENT_PROFILE.SYS</span>
+                    <span>
+            <span class="badge mint" th:if="${profile != null and profile.complete}">Complete</span>
+            <span class="badge yellow" th:unless="${profile != null and profile.complete}">Incomplete</span>
+          </span>
+                </div>
+                <div class="window-body">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label>Full name</label>
+                            <input class="input" type="text" th:value="${user.fullName}" disabled>
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <input class="input" type="email" th:value="${user.email}" disabled>
+                        </div>
+
+                        <div class="field">
+                            <label for="rollNo">Roll number</label>
+                            <input class="input" type="text" th:field="*{rollNo}" placeholder="e.g. 102403456">
+                            <span class="field-error" th:errors="*{rollNo}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="branch">Branch</label>
+                            <select class="input" th:field="*{branch}">
+                                <option value="">Select branch</option>
+                                <option th:each="b : ${branches}" th:value="${b}" th:text="${b.label}">Branch</option>
+                            </select>
+                            <span class="field-error" th:errors="*{branch}"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="batch">Passing year</label>
+                            <input class="input" type="number" th:field="*{batch}" min="2020" max="2035" placeholder="e.g. 2028">
+                            <span class="field-error" th:errors="*{batch}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="cgpa">CGPA</label>
+                            <input class="input" type="number" th:field="*{cgpa}" step="0.01" min="0" max="10" placeholder="e.g. 8.45">
+                            <span class="field-error" th:errors="*{cgpa}"></span>
+                        </div>
+
+                        <div class="field">
+                            <label for="activeBacklogs">Active backlogs</label>
+                            <input class="input" type="number" th:field="*{activeBacklogs}" min="0" placeholder="0">
+                            <span class="hint">Subjects not yet cleared</span>
+                            <span class="field-error" th:errors="*{activeBacklogs}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="phone">Mobile number</label>
+                            <input class="input" type="tel" th:field="*{phone}" placeholder="10-digit number">
+                            <span class="field-error" th:errors="*{phone}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="window">
+                <div class="window-bar mint"><span>RESUME.PDF</span></div>
+                <div class="window-body">
+                    <div class="current-file" th:if="${profile != null and profile.resumeFileName != null}">
+                        <span>📄 <strong th:text="${profile.resumeOriginalName}">resume.pdf</strong></span>
+                        <a class="btn btn-sm" th:href="@{/student/resume}" target="_blank">View</a>
+                    </div>
+                    <div class="file-box">
+                        <input type="file" id="resume" name="resume" accept="application/pdf,.pdf">
+                        <span class="hint"
+                              th:text="${profile != null and profile.resumeFileName != null} ? 'Upload a new file to replace the current one. PDF only, max 2 MB.' : 'PDF only, max 2 MB.'">
+              PDF only, max 2 MB.
+            </span>
+                    </div>
+                    <span class="field-error" id="resume-error" th:text="${resumeError}"></span>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Save profile</button>
+                <a class="btn" th:href="@{/student/dashboard}">Cancel</a>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script>
+    // Catch wrong file type / size before uploading
+    document.getElementById('resume').addEventListener('change', function () {
+        var err = document.getElementById('resume-error');
+        var f = this.files[0];
+        err.textContent = '';
+        if (!f) return;
+        if (!f.name.toLowerCase().endsWith('.pdf')) {
+            err.textContent = 'Resume must be a PDF file.';
+            this.value = '';
+        } else if (f.size > 2 * 1024 * 1024) {
+            err.textContent = 'Resume must be 2 MB or smaller.';
+            this.value = '';
+        }
+    });
+</script>
+</body>
+</html>

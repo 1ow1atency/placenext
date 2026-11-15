@@ -27,9 +27,9 @@
     <th:block th:if="${role == 'STUDENT'}">
         <div class="nav-label">STUDENT</div>
         <a th:href="@{/student/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a th:href="@{/student/profile}" th:classappend="${active == 'profile'} ? 'active'">Profile</a>
         <a href="#">Drives <span class="soon">SOON</span></a>
         <a href="#">My applications <span class="soon">SOON</span></a>
-        <a href="#">Profile <span class="soon">SOON</span></a>
     </th:block>
 
     <th:block th:if="${role == 'RECRUITER'}">
@@ -42,9 +42,9 @@
     <th:block th:if="${role == 'ADMIN'}">
         <div class="nav-label">PLACEMENT OFFICER</div>
         <a th:href="@{/admin/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
+        <a th:href="@{/admin/recruiters}" th:classappend="${active == 'recruiters'} ? 'active'">Recruiters</a>
         <a href="#">Drives <span class="soon">SOON</span></a>
         <a href="#">Students <span class="soon">SOON</span></a>
-        <a href="#">Recruiters <span class="soon">SOON</span></a>
         <a href="#">Reports <span class="soon">SOON</span></a>
     </th:block>
 </nav>

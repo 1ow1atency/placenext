@@ -13,6 +13,10 @@
             </div>
             <div class="window-body">
                 <h1 th:text="'Welcome, ' + ${user.fullName}">Welcome</h1>
+                <p th:if="${recruiter != null}">
+                    <span class="badge mint" th:text="${recruiter.companyName}">Company</span>
+                    <span th:if="${recruiter.designation != null}" th:text="' · ' + ${recruiter.designation}"></span>
+                </p>
                 <p>Post placement drives, review applicants and schedule rounds.</p>
             </div>
         </div>

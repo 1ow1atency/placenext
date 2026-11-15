@@ -13,8 +13,22 @@
             </div>
             <div class="window-body">
                 <h1 th:text="'Hi, ' + ${user.fullName} + '!'">Hi!</h1>
-                <p>Complete your profile so you can start applying to placement drives.</p>
-                <span class="badge yellow">Profile incomplete</span>
+
+                <th:block th:unless="${profileComplete}">
+                    <p>Complete your profile and upload your resume so you can start applying to drives.</p>
+                    <div class="form-actions">
+                        <span class="badge yellow">Profile incomplete</span>
+                        <a class="btn btn-sm btn-yellow" th:href="@{/student/profile}">Complete profile</a>
+                    </div>
+                </th:block>
+
+                <th:block th:if="${profileComplete}">
+                    <p th:text="${profile.branch.label} + ' · Batch of ' + ${profile.batch} + ' · CGPA ' + ${profile.cgpa}">Branch info</p>
+                    <div class="form-actions">
+                        <span class="badge mint">Profile complete</span>
+                        <a class="btn btn-sm" th:href="@{/student/profile}">Edit profile</a>
+                    </div>
+                </th:block>
             </div>
         </div>
 
