@@ -9,6 +9,9 @@
 
         <p><a th:href="@{/student/drives}">← All drives</a></p>
 
+        <div class="alert alert-success" th:if="${message}" th:text="${message}">Done</div>
+        <div class="alert alert-error" th:if="${error}" th:text="${error}">Error</div>
+
         <div class="window">
             <div class="window-bar">
                 <span>DRIVE_INFO.DAT</span>
@@ -58,8 +61,20 @@
                 </ul>
 
                 <div class="form-actions" style="margin-top:16px">
-                    <button class="btn btn-primary" disabled style="opacity:.5; cursor:not-allowed">Apply</button>
-                    <span class="hint" style="margin:0">Applications open in the next update (step 8).</span>
+
+          <span class="badge" th:if="${hasApplied}" th:classappend="${statusClass}"
+                th:text="'Application: ' + ${statusLabel}">Status</span>
+                    <a class="btn btn-sm" th:if="${hasApplied}" th:href="@{/student/applications}">View my applications</a>
+
+                    <form th:if="${canApply}" th:action="@{/student/drives/{id}/apply(id=${drive.id})}" method="post" style="margin:0">
+                        <button type="submit" class="btn btn-primary"
+                                th:text="${wasWithdrawn} ? 'Re-apply' : 'Apply now'">Apply now</button>
+                    </form>
+
+                    <button class="btn" disabled style="opacity:.5; cursor:not-allowed"
+                            th:if="${!hasApplied and !canApply}">Apply</button>
+                    <span class="hint" style="margin:0" th:if="${deadlinePassed and !hasApplied}">The deadline has passed.</span>
+
                 </div>
             </div>
         </div>

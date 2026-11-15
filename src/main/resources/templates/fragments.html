@@ -29,7 +29,7 @@
         <a th:href="@{/student/dashboard}" th:classappend="${active == 'dashboard'} ? 'active'">Dashboard</a>
         <a th:href="@{/student/profile}" th:classappend="${active == 'profile'} ? 'active'">Profile</a>
         <a th:href="@{/student/drives}" th:classappend="${active == 'drives'} ? 'active'">Drives</a>
-        <a href="#">My applications <span class="soon">SOON</span></a>
+        <a th:href="@{/student/applications}" th:classappend="${active == 'applications'} ? 'active'">My applications</a>
     </th:block>
 
     <th:block th:if="${role == 'RECRUITER'}">

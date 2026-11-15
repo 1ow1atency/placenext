@@ -183,3 +183,8 @@ textarea.input { min-height: 120px; resize: vertical; line-height: 1.5; }
 .kv dd { margin: 0; }
 .pre-wrap { white-space: pre-wrap; }
 @media (max-width: 860px) { .kv { grid-template-columns: 1fr; } }
+
+.status-APPLIED { background: var(--pink); }
+.status-SHORTLISTED { background: var(--mint); }
+.status-SELECTED { background: var(--mint); }
+.status-WITHDRAWN { background: var(--white); color: var(--muted); }

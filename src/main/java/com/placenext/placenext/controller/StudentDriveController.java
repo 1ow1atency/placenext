@@ -1,12 +1,15 @@
 package com.placenext.placenext.controller;
 
 import com.placenext.placenext.dto.DriveEligibility;
+import com.placenext.placenext.model.Application;
+import com.placenext.placenext.model.ApplicationStatus;
 import com.placenext.placenext.model.Drive;
 import com.placenext.placenext.model.DriveStatus;
 import com.placenext.placenext.model.StudentProfile;
 import com.placenext.placenext.model.User;
 import com.placenext.placenext.repository.StudentProfileRepository;
 import com.placenext.placenext.repository.UserRepository;
+import com.placenext.placenext.service.ApplicationService;
 import com.placenext.placenext.service.DriveService;
 import com.placenext.placenext.service.EligibilityService;
 import org.springframework.security.core.Authentication;
@@ -26,15 +29,18 @@ public class StudentDriveController {
     private final StudentProfileRepository studentProfileRepository;
     private final DriveService driveService;
     private final EligibilityService eligibilityService;
+    private final ApplicationService applicationService;
 
     public StudentDriveController(UserRepository userRepository,
                                   StudentProfileRepository studentProfileRepository,
                                   DriveService driveService,
-                                  EligibilityService eligibilityService) {
+                                  EligibilityService eligibilityService,
+                                  ApplicationService applicationService) {
         this.userRepository = userRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.driveService = driveService;
         this.eligibilityService = eligibilityService;
+        this.applicationService = applicationService;
     }
 
     @GetMapping
@@ -55,8 +61,20 @@ public class StudentDriveController {
             return "redirect:/student/drives";
         }
         StudentProfile profile = currentProfile(auth);
+        Application application = profile == null ? null : applicationService.find(profile, drive).orElse(null);
+
+        boolean hasApplied = application != null && application.getStatus() != ApplicationStatus.WITHDRAWN;
+        boolean wasWithdrawn = application != null && application.getStatus() == ApplicationStatus.WITHDRAWN;
+        List<String> reasons = eligibilityService.check(profile, drive);
+
         model.addAttribute("drive", drive);
-        model.addAttribute("reasons", eligibilityService.check(profile, drive));
+        model.addAttribute("reasons", reasons);
+        model.addAttribute("hasApplied", hasApplied);
+        model.addAttribute("wasWithdrawn", wasWithdrawn);
+        model.addAttribute("statusLabel", hasApplied ? application.getStatus().getLabel() : "");
+        model.addAttribute("statusClass", hasApplied ? "status-" + application.getStatus().name() : "");
+        model.addAttribute("deadlinePassed", drive.isDeadlinePassed());
+        model.addAttribute("canApply", !hasApplied && reasons.isEmpty() && !drive.isDeadlinePassed());
         return "student/drive-detail";
     }
 

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('My applications')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('applications', 'STUDENT')}"></nav>
+    <main class="main">
+
+        <div class="page-title">
+            <h1>My applications</h1>
+            <p>Track every drive you've applied to.</p>
+        </div>
+
+        <div class="alert alert-success" th:if="${message}" th:text="${message}">Done</div>
+        <div class="alert alert-error" th:if="${error}" th:text="${error}">Error</div>
+
+        <div class="window">
+            <div class="window-bar mint">
+                <span>APPLICATIONS.DAT</span>
+                <span class="badge" th:text="${#lists.size(applications)} + ' total'">0 total</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(applications)}">
+                    <div class="empty-icon">📨</div>
+                    <strong>No applications yet</strong>
+                    <p>Browse <a th:href="@{/student/drives}">open drives</a> and apply to ones you're eligible for.</p>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(applications)}">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Drive</th><th>Company</th><th>Pay</th><th>Applied on</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a : ${applications}">
+                            <td><a th:href="@{/student/drives/{id}(id=${a.drive.id})}" th:text="${a.drive.title}">Drive</a></td>
+                            <td th:text="${a.drive.companyName}">Company</td>
+                            <td th:text="${a.drive.compensation}">Pay</td>
+                            <td th:text="${#temporals.format(a.appliedAt, 'dd MMM yyyy')}">Date</td>
+                            <td><span class="badge" th:classappend="'status-' + ${a.status}" th:text="${a.status.label}">Status</span></td>
+                            <td>
+                                <form th:if="${a.status.name() == 'APPLIED'}"
+                                      th:action="@{/student/applications/{id}/withdraw(id=${a.id})}" method="post" class="inline-form">
+                                    <button type="submit" class="btn btn-sm btn-danger">Withdraw</button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

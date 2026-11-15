@@ -5,6 +5,7 @@ import com.placenext.placenext.model.*;
 import com.placenext.placenext.repository.RecruiterProfileRepository;
 import com.placenext.placenext.repository.StudentProfileRepository;
 import com.placenext.placenext.repository.UserRepository;
+import com.placenext.placenext.service.ApplicationService;
 import com.placenext.placenext.service.DriveService;
 import com.placenext.placenext.service.EligibilityService;
 import org.springframework.security.core.Authentication;
@@ -22,17 +23,20 @@ public class DashboardController {
     private final RecruiterProfileRepository recruiterProfileRepository;
     private final DriveService driveService;
     private final EligibilityService eligibilityService;
+    private final ApplicationService applicationService;
 
     public DashboardController(UserRepository userRepository,
                                StudentProfileRepository studentProfileRepository,
                                RecruiterProfileRepository recruiterProfileRepository,
                                DriveService driveService,
-                               EligibilityService eligibilityService) {
+                               EligibilityService eligibilityService,
+                               ApplicationService applicationService) {
         this.userRepository = userRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.recruiterProfileRepository = recruiterProfileRepository;
         this.driveService = driveService;
         this.eligibilityService = eligibilityService;
+        this.applicationService = applicationService;
     }
 
     @GetMapping("/student/dashboard")
@@ -43,10 +47,21 @@ public class DashboardController {
         List<DriveEligibility> eligible = eligibilityService.evaluate(profile, driveService.openDrives())
                 .stream().filter(DriveEligibility::isEligible).toList();
 
+        long applications = 0, shortlisted = 0, offers = 0;
+        if (profile != null) {
+            applications = applicationService.countForStudent(profile)
+                    - applicationService.countForStudent(profile, ApplicationStatus.WITHDRAWN);
+            shortlisted = applicationService.countForStudent(profile, ApplicationStatus.SHORTLISTED);
+            offers = applicationService.countForStudent(profile, ApplicationStatus.SELECTED);
+        }
+
         model.addAttribute("user", user);
         model.addAttribute("profile", profile);
         model.addAttribute("profileComplete", profile != null && profile.isComplete());
         model.addAttribute("eligibleCount", eligible.size());
+        model.addAttribute("applicationCount", applications);
+        model.addAttribute("shortlistedCount", shortlisted);
+        model.addAttribute("offerCount", offers);
         model.addAttribute("upcoming", eligible.stream().limit(3).toList());
         return "student/dashboard";
     }
