@@ -15,8 +15,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
@@ -66,6 +68,35 @@ public class RecruiterApplicantController {
         return "recruiter/applicants";
     }
 
+    @PostMapping("/applicants/{applicationId}/status")
+    public String changeStatus(@PathVariable("driveId") Long driveId,
+                               @PathVariable("applicationId") Long applicationId,
+                               @RequestParam("action") String action,
+                               Authentication auth,
+                               RedirectAttributes redirect) {
+        Drive drive = ownedDrive(driveId, auth);
+        if (drive == null) return "redirect:/recruiter/drives";
+
+        Application app = applicantService.findById(applicationId).orElse(null);
+        if (app == null || !app.getDrive().getId().equals(drive.getId())) {
+            redirect.addFlashAttribute("error", "Application not found.");
+            return "redirect:/recruiter/drives/" + driveId + "/applicants";
+        }
+        ApplicationStatus target = parseStatus(action);
+        if (target == null) {
+            redirect.addFlashAttribute("error", "Unknown action.");
+            return "redirect:/recruiter/drives/" + driveId + "/applicants";
+        }
+        try {
+            applicantService.changeStatus(app, target);
+            redirect.addFlashAttribute("message",
+                    app.getStudent().getUser().getFullName() + " marked as " + target.getLabel() + ".");
+        } catch (IllegalArgumentException e) {
+            redirect.addFlashAttribute("error", e.getMessage());
+        }
+        return "redirect:/recruiter/drives/" + driveId + "/applicants";
+    }
+
     @GetMapping("/applicants/export")
     public ResponseEntity<byte[]> export(@PathVariable("driveId") Long driveId,
                                          @RequestParam(value = "status", required = false) String status,
@@ -101,7 +132,6 @@ public class RecruiterApplicantController {
                 .body(file);
     }
 
-    /** Returns the drive only if it belongs to the logged-in recruiter. */
     private Drive ownedDrive(Long driveId, Authentication auth) {
         User user = userRepository.findByEmail(auth.getName()).orElseThrow();
         RecruiterProfile recruiter = recruiterProfileRepository.findByUser(user).orElse(null);

@@ -6,7 +6,9 @@ import com.placenext.placenext.model.Drive;
 import com.placenext.placenext.model.StudentProfile;
 import com.placenext.placenext.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +21,6 @@ public class ApplicantService {
         this.applicationRepository = applicationRepository;
     }
 
-    /** Applicants for a drive (withdrawn ones hidden), optionally filtered by status and minimum CGPA. */
     public List<Application> applicants(Drive drive, ApplicationStatus status, Double minCgpa) {
         return applicationRepository
                 .findByDriveAndStatusNotOrderByAppliedAtDesc(drive, ApplicationStatus.WITHDRAWN)
@@ -37,7 +38,24 @@ public class ApplicantService {
         return applicationRepository.findById(id);
     }
 
-    /** Builds a CSV of the given applications. */
+    /** Moves an application forward. Only valid transitions are allowed. */
+    @Transactional
+    public void changeStatus(Application app, ApplicationStatus target) {
+        ApplicationStatus current = app.getStatus();
+        boolean allowed =
+                (current == ApplicationStatus.APPLIED
+                        && (target == ApplicationStatus.SHORTLISTED || target == ApplicationStatus.REJECTED))
+                        || (current == ApplicationStatus.SHORTLISTED
+                        && (target == ApplicationStatus.SELECTED || target == ApplicationStatus.REJECTED));
+        if (!allowed) {
+            throw new IllegalArgumentException(
+                    "Can't move an application from " + current.getLabel() + " to " + target.getLabel() + ".");
+        }
+        app.setStatus(target);
+        app.setUpdatedAt(LocalDateTime.now());
+        applicationRepository.save(app);
+    }
+
     public String toCsv(List<Application> applications) {
         StringBuilder sb = new StringBuilder();
         sb.append("Name,Email,Roll No,Branch,Batch,CGPA,Backlogs,Phone,Status,Applied On\n");
@@ -60,7 +78,6 @@ public class ApplicantService {
     private String csv(String value) {
         if (value == null) return "";
         String v = value;
-        // Stop spreadsheet formula injection
         if (!v.isEmpty() && "=+-@".indexOf(v.charAt(0)) >= 0) {
             v = "'" + v;
         }

@@ -18,6 +18,9 @@
                th:href="@{/recruiter/drives/{id}/applicants/export(id=${drive.id}, status=${statusFilter}, minCgpa=${minCgpaFilter})}">⬇ Download CSV</a>
         </div>
 
+        <div class="alert alert-success" th:if="${message}" th:text="${message}">Done</div>
+        <div class="alert alert-error" th:if="${error}" th:text="${error}">Error</div>
+
         <div class="window">
             <div class="window-bar yellow"><span>FILTERS.CFG</span></div>
             <div class="window-body">
@@ -60,7 +63,7 @@
                         <thead>
                         <tr>
                             <th>Name</th><th>Roll no</th><th>Branch</th><th>CGPA</th><th>Backlogs</th>
-                            <th>Phone</th><th>Applied</th><th>Status</th><th>Resume</th>
+                            <th>Phone</th><th>Applied</th><th>Status</th><th>Resume</th><th>Action</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -79,6 +82,29 @@
                             <td>
                                 <a class="btn btn-sm" target="_blank"
                                    th:href="@{/recruiter/drives/{d}/applicants/{a}/resume(d=${drive.id}, a=${a.id})}">View</a>
+                            </td>
+                            <td>
+                                <div class="inline-form" th:if="${a.status.name() == 'APPLIED'}">
+                                    <form th:action="@{/recruiter/drives/{d}/applicants/{a}/status(d=${drive.id}, a=${a.id})}" method="post" class="inline-form">
+                                        <input type="hidden" name="action" value="SHORTLISTED">
+                                        <button type="submit" class="btn btn-sm btn-mint">Shortlist</button>
+                                    </form>
+                                    <form th:action="@{/recruiter/drives/{d}/applicants/{a}/status(d=${drive.id}, a=${a.id})}" method="post" class="inline-form">
+                                        <input type="hidden" name="action" value="REJECTED">
+                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                    </form>
+                                </div>
+                                <div class="inline-form" th:if="${a.status.name() == 'SHORTLISTED'}">
+                                    <form th:action="@{/recruiter/drives/{d}/applicants/{a}/status(d=${drive.id}, a=${a.id})}" method="post" class="inline-form">
+                                        <input type="hidden" name="action" value="SELECTED">
+                                        <button type="submit" class="btn btn-sm btn-mint">Select</button>
+                                    </form>
+                                    <form th:action="@{/recruiter/drives/{d}/applicants/{a}/status(d=${drive.id}, a=${a.id})}" method="post" class="inline-form">
+                                        <input type="hidden" name="action" value="REJECTED">
+                                        <button type="submit" class="btn btn-sm btn-danger">Reject</button>
+                                    </form>
+                                </div>
+                                <span class="hint" th:if="${a.status.name() == 'REJECTED' or a.status.name() == 'SELECTED'}">Final</span>
                             </td>
                         </tr>
                         </tbody>
