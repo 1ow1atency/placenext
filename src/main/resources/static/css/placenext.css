@@ -256,3 +256,6 @@ textarea.input { min-height: 120px; resize: vertical; line-height: 1.5; }
 .offer-title { font-weight: 800; margin: 0 0 4px; }
 .offer-text { margin: 0 0 6px; font-size: 14px; }
 .offer-warn { margin: 0 0 10px; font-size: 12px; opacity: .8; }
+
+/* ===== Admin dashboard and students (Step 14) ===== */
+.window-bar.pink { background: var(--pink); }

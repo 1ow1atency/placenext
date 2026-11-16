@@ -2,13 +2,13 @@ package com.placenext.placenext.controller;
 
 import com.placenext.placenext.dto.DriveEligibility;
 import com.placenext.placenext.model.*;
-import com.placenext.placenext.repository.ApplicationRepository;
 import com.placenext.placenext.repository.RecruiterProfileRepository;
 import com.placenext.placenext.repository.StudentProfileRepository;
 import com.placenext.placenext.repository.UserRepository;
 import com.placenext.placenext.service.ApplicationService;
 import com.placenext.placenext.service.DriveService;
 import com.placenext.placenext.service.EligibilityService;
+import com.placenext.placenext.service.StatsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +25,7 @@ public class DashboardController {
     private final DriveService driveService;
     private final EligibilityService eligibilityService;
     private final ApplicationService applicationService;
-    private final ApplicationRepository applicationRepository;
+    private final StatsService statsService;
 
     public DashboardController(UserRepository userRepository,
                                StudentProfileRepository studentProfileRepository,
@@ -33,14 +33,14 @@ public class DashboardController {
                                DriveService driveService,
                                EligibilityService eligibilityService,
                                ApplicationService applicationService,
-                               ApplicationRepository applicationRepository) {
+                               StatsService statsService) {
         this.userRepository = userRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.recruiterProfileRepository = recruiterProfileRepository;
         this.driveService = driveService;
         this.eligibilityService = eligibilityService;
         this.applicationService = applicationService;
-        this.applicationRepository = applicationRepository;
+        this.statsService = statsService;
     }
 
     @GetMapping("/student/dashboard")
@@ -97,13 +97,15 @@ public class DashboardController {
     @GetMapping("/admin/dashboard")
     public String adminDashboard(Authentication auth, Model model) {
         List<Drive> pending = driveService.pending();
+        StatsService.Stats stats = statsService.overview();
 
         model.addAttribute("user", currentUser(auth));
-        model.addAttribute("studentCount", userRepository.countByRole(Role.STUDENT));
-        model.addAttribute("recruiterCount", userRepository.countByRole(Role.RECRUITER));
-        model.addAttribute("driveCount", driveService.countAll());
+        model.addAttribute("stats", stats);
+        model.addAttribute("studentCount", stats.getStudentCount());
+        model.addAttribute("recruiterCount", stats.getRecruiterCount());
+        model.addAttribute("driveCount", stats.getDriveCount());
         model.addAttribute("pendingCount", pending.size());
-        model.addAttribute("placedCount", applicationRepository.countByOfferStatus(OfferStatus.ACCEPTED));
+        model.addAttribute("placedCount", stats.getPlacedCount());
         model.addAttribute("pendingDrives", pending.stream().limit(5).toList());
         return "admin/dashboard";
     }

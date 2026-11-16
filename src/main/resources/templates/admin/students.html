@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Students')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('students', 'ADMIN')}"></nav>
+    <main class="main">
+
+        <div class="page-head">
+            <div class="page-title">
+                <h1>Students</h1>
+                <p>All registered students and their placement status</p>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar yellow"><span>FILTERS.CFG</span></div>
+            <div class="window-body">
+                <form th:action="@{/admin/students}" method="get" class="filter-bar">
+                    <div class="field">
+                        <label for="q">Search</label>
+                        <input class="input" type="text" id="q" name="q" th:value="${q}"
+                               placeholder="Name, email or roll no">
+                    </div>
+                    <div class="field">
+                        <label for="branch">Branch</label>
+                        <select class="input" id="branch" name="branch">
+                            <option value="">All</option>
+                            <option th:each="b : ${branches}" th:value="${b.name()}" th:text="${b.name()}"
+                                    th:selected="${b.name() == branchFilter}">CSE</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="placed">Placement</label>
+                        <select class="input" id="placed" name="placed">
+                            <option value="" th:selected="${placedFilter == ''}">All</option>
+                            <option value="placed" th:selected="${placedFilter == 'placed'}">Placed</option>
+                            <option value="unplaced" th:selected="${placedFilter == 'unplaced'}">Not placed</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <button type="submit" class="btn btn-primary">Apply filters</button>
+                        <a class="btn" th:href="@{/admin/students}">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar mint">
+                <span>STUDENTS.DAT</span>
+                <span class="badge" th:text="${#lists.size(students)} + ' shown'">0 shown</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(students)}">
+                    <div class="empty-icon">🔍</div>
+                    <strong>No students match</strong>
+                    <p>Try clearing the filters.</p>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(students)}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Student</th><th>Roll no</th><th>Branch</th><th>Batch</th>
+                            <th>CGPA</th><th>Backlogs</th><th>Phone</th><th>Placement</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="s : ${students}">
+                            <td>
+                                <strong th:text="${s.user.fullName}">Name</strong><br>
+                                <span class="hint" th:text="${s.user.email}">email</span>
+                            </td>
+                            <td th:text="${s.rollNo}">Roll</td>
+                            <td th:text="${s.branch.name()}">CSE</td>
+                            <td th:text="${s.batch}">2027</td>
+                            <td th:text="${s.cgpa}">8.0</td>
+                            <td th:text="${s.activeBacklogs}">0</td>
+                            <td th:text="${s.phone}">Phone</td>
+                            <td>
+                                <span class="badge status-SELECTED" th:if="${placedIds.contains(s.id)}">Placed</span>
+                                <span class="hint" th:unless="${placedIds.contains(s.id)}">Not placed</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>
