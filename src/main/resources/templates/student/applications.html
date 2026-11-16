@@ -7,47 +7,70 @@
     <nav th:replace="~{fragments :: sidenav('applications', 'STUDENT')}"></nav>
     <main class="main">
 
-        <div class="page-title">
-            <h1>My applications</h1>
-            <p>Track every drive you've applied to.</p>
+        <div class="page-head">
+            <div class="page-title">
+                <h1>My applications</h1>
+                <p>Track every drive you have applied to</p>
+            </div>
+            <a class="btn btn-primary" th:href="@{/student/drives}">Browse drives</a>
         </div>
 
-        <div class="alert alert-success" th:if="${message}" th:text="${message}">Done</div>
+        <div class="alert alert-success" th:if="${success}" th:text="${success}">Done</div>
         <div class="alert alert-error" th:if="${error}" th:text="${error}">Error</div>
 
-        <div class="window">
-            <div class="window-bar mint">
-                <span>APPLICATIONS.DAT</span>
-                <span class="badge" th:text="${#lists.size(applications)} + ' total'">0 total</span>
-            </div>
+        <div class="window" th:if="${#lists.isEmpty(applications)}">
+            <div class="window-bar mint"><span>APPLICATIONS.DAT</span></div>
             <div class="window-body">
-                <div class="empty" th:if="${#lists.isEmpty(applications)}">
+                <div class="empty">
                     <div class="empty-icon">📨</div>
                     <strong>No applications yet</strong>
-                    <p>Browse <a th:href="@{/student/drives}">open drives</a> and apply to ones you're eligible for.</p>
+                    <p>Find a drive you are eligible for and hit apply.</p>
+                    <a class="btn btn-yellow" th:href="@{/student/drives}">Browse drives</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="drive-list" th:unless="${#lists.isEmpty(applications)}">
+            <div class="drive-card" th:each="a : ${applications}">
+                <div class="drive-top">
+                    <div>
+                        <p class="drive-title" th:text="${a.drive.title}">Title</p>
+                        <div class="drive-company" th:text="${a.drive.companyName}">Company</div>
+                    </div>
+                    <span class="badge" th:classappend="'status-' + ${a.status}" th:text="${a.status.label}">Status</span>
                 </div>
 
-                <div class="table-wrap" th:unless="${#lists.isEmpty(applications)}">
-                    <table class="table">
-                        <thead>
-                        <tr><th>Drive</th><th>Company</th><th>Pay</th><th>Applied on</th><th>Status</th><th></th></tr>
-                        </thead>
-                        <tbody>
-                        <tr th:each="a : ${applications}">
-                            <td><a th:href="@{/student/drives/{id}(id=${a.drive.id})}" th:text="${a.drive.title}">Drive</a></td>
-                            <td th:text="${a.drive.companyName}">Company</td>
-                            <td th:text="${a.drive.compensation}">Pay</td>
-                            <td th:text="${#temporals.format(a.appliedAt, 'dd MMM yyyy')}">Date</td>
-                            <td><span class="badge" th:classappend="'status-' + ${a.status}" th:text="${a.status.label}">Status</span></td>
-                            <td>
-                                <form th:if="${a.status.name() == 'APPLIED'}"
-                                      th:action="@{/student/applications/{id}/withdraw(id=${a.id})}" method="post" class="inline-form">
-                                    <button type="submit" class="btn btn-sm btn-danger">Withdraw</button>
-                                </form>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="drive-meta">
+                    <span>💰 <strong th:text="${a.drive.compensation}">—</strong></span>
+                    <span>🗓 Applied <strong th:text="${#temporals.format(a.appliedAt, 'dd MMM yyyy')}">date</strong></span>
+                </div>
+
+                <!-- Rounds: only for shortlisted / selected applications -->
+                <div class="round-list"
+                     th:if="${(a.status.name() == 'SHORTLISTED' or a.status.name() == 'SELECTED') and rounds.get(a.drive.id) != null and !rounds.get(a.drive.id).isEmpty()}">
+                    <p class="round-heading">Selection rounds</p>
+                    <div class="round-card" th:each="r : ${rounds.get(a.drive.id)}"
+                         th:classappend="${r.past} ? 'round-past' : ''">
+                        <div class="round-no" th:text="${r.roundNo}">1</div>
+                        <div class="round-info">
+                            <strong th:text="${r.type.label}">Aptitude</strong>
+                            <span th:text="${#temporals.format(r.scheduledAt, 'EEE, dd MMM yyyy · hh:mm a')}">date</span>
+                            <span th:text="'📍 ' + ${r.venue}">venue</span>
+                            <span th:if="${r.instructions != null and !r.instructions.isEmpty()}"
+                                  th:text="'ℹ ' + ${r.instructions}">notes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="note"
+                     th:if="${a.status.name() == 'APPLIED'}">Waiting for the recruiter to review your application. Rounds appear here once you are shortlisted.</div>
+
+                <div class="form-actions" th:if="${a.status.name() == 'APPLIED' or a.status.name() == 'SHORTLISTED'}">
+                    <a class="btn btn-sm" th:href="@{/student/drives/{id}(id=${a.drive.id})}">View drive</a>
+                    <form th:action="@{/student/applications/{id}/withdraw(id=${a.id})}" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Withdraw this application?')">Withdraw</button>
+                    </form>
                 </div>
             </div>
         </div>

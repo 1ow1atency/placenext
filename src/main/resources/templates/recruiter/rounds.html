@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Rounds')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'RECRUITER')}"></nav>
+    <main class="main">
+
+        <p><a th:href="@{/recruiter/drives}">← My drives</a></p>
+
+        <div class="page-title">
+            <h1 th:text="'Rounds: ' + ${drive.title}">Rounds</h1>
+            <p>Schedule the selection process. Students applying to this drive can see these rounds.</p>
+        </div>
+
+        <div class="alert alert-success" th:if="${message}" th:text="${message}">Done</div>
+        <div class="alert alert-error" th:if="${error}" th:text="${error}">Error</div>
+
+        <div class="window">
+            <div class="window-bar mint">
+                <span>SCHEDULE.DAT</span>
+                <span class="badge" th:text="${#lists.size(rounds)} + ' round(s)'">0 rounds</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(rounds)}">
+                    <div class="empty-icon">🗓</div>
+                    <strong>No rounds scheduled yet</strong>
+                    <p>Add the first round using the form below.</p>
+                </div>
+
+                <div class="drive-list" th:unless="${#lists.isEmpty(rounds)}">
+                    <div class="drive-card" th:each="r : ${rounds}" th:classappend="${r.past} ? 'dim'">
+                        <div class="drive-top">
+                            <div>
+                                <p class="drive-title" th:text="'Round ' + ${r.roundNo} + ': ' + ${r.type.label}">Round</p>
+                                <div class="drive-company"
+                                     th:text="${#temporals.format(r.scheduledAt, 'EEEE, dd MMM yyyy · hh:mm a')}">Date</div>
+                            </div>
+                            <span class="badge" th:classappend="${r.past} ? '' : 'mint'" th:text="${r.past} ? 'Done' : 'Upcoming'">Upcoming</span>
+                        </div>
+                        <div class="drive-meta">
+                            <span>📍 <strong th:text="${r.venue}">Venue</strong></span>
+                        </div>
+                        <p class="pre-wrap" style="font-size:13px; margin:10px 0 0" th:if="${r.instructions != null}"
+                           th:text="${r.instructions}">Instructions</p>
+                        <div class="form-actions">
+                            <form th:action="@{/recruiter/drives/{d}/rounds/{r}/delete(d=${drive.id}, r=${r.id})}" method="post" class="inline-form">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar yellow"><span>ADD_ROUND.EXE</span></div>
+            <div class="window-body">
+                <form th:action="@{/recruiter/drives/{id}/rounds(id=${drive.id})}" th:object="${form}" method="post">
+                    <div class="form-grid">
+                        <div class="field">
+                            <label for="type">Round type</label>
+                            <select class="input" th:field="*{type}">
+                                <option value="">Select type</option>
+                                <option th:each="t : ${types}" th:value="${t}" th:text="${t.label}">Type</option>
+                            </select>
+                            <span class="field-error" th:errors="*{type}"></span>
+                        </div>
+                        <div class="field">
+                            <label for="scheduledAt">Date &amp; time</label>
+                            <input class="input" type="datetime-local" th:field="*{scheduledAt}">
+                            <span class="field-error" th:errors="*{scheduledAt}"></span>
+                        </div>
+                        <div class="field full">
+                            <label for="venue">Venue / meeting link</label>
+                            <input class="input" type="text" th:field="*{venue}" placeholder="e.g. Seminar Hall B, or https://meet.google.com/...">
+                            <span class="field-error" th:errors="*{venue}"></span>
+                        </div>
+                        <div class="field full">
+                            <label for="instructions">Instructions <span class="hint" style="display:inline">(optional)</span></label>
+                            <textarea class="input" th:field="*{instructions}" placeholder="What to bring, topics covered, dress code…"></textarea>
+                            <span class="field-error" th:errors="*{instructions}"></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add round</button>
+                </form>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

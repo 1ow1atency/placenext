@@ -55,6 +55,7 @@
 
                 <div class="form-actions" th:if="${d.status.name() == 'APPROVED'}">
                     <a class="btn btn-sm btn-mint" th:href="@{/recruiter/drives/{id}/applicants(id=${d.id})}">View applicants</a>
+                    <a class="btn btn-sm btn-yellow" th:href="@{/recruiter/drives/{id}/rounds(id=${d.id})}">Rounds</a>
                 </div>
             </div>
         </div>
