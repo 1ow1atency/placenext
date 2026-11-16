@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Access denied · PlaceNext</title>
+    <link rel="stylesheet" th:href="@{/css/placenext.css}">
+    <style>
+        .error-page { max-width: 560px; margin: 80px auto; padding: 0 16px; }
+        .error-code { font-size: 64px; font-weight: 800; margin: 0 0 8px; }
+        .error-text { margin: 0 0 24px; line-height: 1.6; }
+        .error-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+<main class="error-page">
+    <div class="window">
+        <div class="window-bar pink">ACCESS_DENIED.ERR</div>
+        <div style="padding: 24px;">
+            <p class="error-code">403</p>
+            <p class="error-text">
+                You don't have permission to open this page.<br>
+                It belongs to a different role (student, recruiter or placement officer).
+            </p>
+            <div class="error-actions">
+                <a class="btn btn-mint" th:href="@{/dashboard}">Go to my dashboard</a>
+                <a class="btn" href="javascript:history.back()">← Go back</a>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
