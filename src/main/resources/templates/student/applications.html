@@ -45,11 +45,12 @@
                     <span>🗓 Applied <strong th:text="${#temporals.format(a.appliedAt, 'dd MMM yyyy')}">date</strong></span>
                 </div>
 
-                <!-- Rounds: only for shortlisted / selected applications -->
+                <!-- Rounds: shortlisted / selected, or rejected after at least one round result -->
                 <div class="round-list"
-                     th:if="${(a.status.name() == 'SHORTLISTED' or a.status.name() == 'SELECTED') and rounds.get(a.drive.id) != null and !rounds.get(a.drive.id).isEmpty()}">
+                     th:if="${(a.status.name() == 'SHORTLISTED' or a.status.name() == 'SELECTED' or (a.status.name() == 'REJECTED' and !results.get(a.id).isEmpty())) and rounds.get(a.drive.id) != null and !rounds.get(a.drive.id).isEmpty()}">
                     <p class="round-heading">Selection rounds</p>
                     <div class="round-card" th:each="r : ${rounds.get(a.drive.id)}"
+                         th:with="outcome=${results.get(a.id).get(r.id)}"
                          th:classappend="${r.past} ? 'round-past' : ''">
                         <div class="round-no" th:text="${r.roundNo}">1</div>
                         <div class="round-info">
@@ -58,6 +59,12 @@
                             <span th:text="'📍 ' + ${r.venue}">venue</span>
                             <span th:if="${r.instructions != null and !r.instructions.isEmpty()}"
                                   th:text="'ℹ ' + ${r.instructions}">notes</span>
+                        </div>
+                        <div class="round-result">
+                            <span class="badge status-SELECTED" th:if="${outcome != null and outcome.name() == 'PASSED'}">Passed</span>
+                            <span class="badge status-REJECTED" th:if="${outcome != null and outcome.name() == 'FAILED'}">Failed</span>
+                            <span class="hint" th:if="${outcome == null and a.status.name() == 'REJECTED'}">Not reached</span>
+                            <span class="hint" th:if="${outcome == null and a.status.name() != 'REJECTED'}">Pending</span>
                         </div>
                     </div>
                 </div>

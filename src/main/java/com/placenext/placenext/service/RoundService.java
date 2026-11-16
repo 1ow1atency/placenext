@@ -15,9 +15,11 @@ import java.util.Optional;
 public class RoundService {
 
     private final RoundRepository roundRepository;
+    private final RoundResultService roundResultService;
 
-    public RoundService(RoundRepository roundRepository) {
+    public RoundService(RoundRepository roundRepository, RoundResultService roundResultService) {
         this.roundRepository = roundRepository;
+        this.roundResultService = roundResultService;
     }
 
     public List<Round> forDrive(Drive drive) {
@@ -50,13 +52,14 @@ public class RoundService {
         return roundRepository.save(round);
     }
 
-    /** Deletes a round and renumbers the rest. */
+    /** Deletes a round (and its recorded results) and renumbers the rest. */
     @Transactional
     public void delete(Drive drive, Long roundId) {
         Round round = roundRepository.findById(roundId).orElseThrow();
         if (!round.getDrive().getId().equals(drive.getId())) {
             throw new IllegalArgumentException("That round doesn't belong to this drive.");
         }
+        roundResultService.deleteForRound(round);
         roundRepository.delete(round);
         roundRepository.flush();
 

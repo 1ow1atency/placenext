@@ -45,6 +45,8 @@
                         <p class="pre-wrap" style="font-size:13px; margin:10px 0 0" th:if="${r.instructions != null}"
                            th:text="${r.instructions}">Instructions</p>
                         <div class="form-actions">
+                            <a class="btn btn-sm btn-yellow"
+                               th:href="@{/recruiter/drives/{d}/rounds/{r}/results(d=${drive.id}, r=${r.id})}">Results</a>
                             <form th:action="@{/recruiter/drives/{d}/rounds/{r}/delete(d=${drive.id}, r=${r.id})}" method="post" class="inline-form">
                                 <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                             </form>

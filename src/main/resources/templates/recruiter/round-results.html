@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Round results')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('drives', 'RECRUITER')}"></nav>
+    <main class="main">
+
+        <p><a th:href="@{/recruiter/drives/{id}/rounds(id=${drive.id})}">← Back to rounds</a></p>
+
+        <div class="page-head">
+            <div class="page-title">
+                <h1 th:text="'Round ' + ${round.roundNo} + ': ' + ${round.type.label}">Round</h1>
+                <p th:text="${drive.title} + ' · ' + ${#temporals.format(round.scheduledAt, 'EEE, dd MMM yyyy · hh:mm a')} + ' · ' + ${round.venue}">Info</p>
+            </div>
+        </div>
+
+        <div class="alert alert-success" th:if="${message}" th:text="${message}">Done</div>
+        <div class="alert alert-error" th:if="${error}" th:text="${error}">Error</div>
+
+        <div class="note">Marking an applicant <strong>Failed</strong> rejects their application automatically. Passed applicants stay shortlisted for the next round. Use <strong>Select</strong> on the applicants page to make the final offer.</div>
+
+        <div class="window">
+            <div class="window-bar mint">
+                <span>ROUND_RESULTS.DAT</span>
+                <span class="badge" th:text="${#lists.size(applicants)} + ' shown'">0 shown</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(applicants)}">
+                    <div class="empty-icon">📭</div>
+                    <strong>No shortlisted applicants yet</strong>
+                    <p>Shortlist applicants first, then record their results here.</p>
+                    <a class="btn btn-mint" th:href="@{/recruiter/drives/{id}/applicants(id=${drive.id})}">Go to applicants</a>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(applicants)}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Name</th><th>Roll no</th><th>Branch</th><th>CGPA</th>
+                            <th>Application</th><th>This round</th><th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="a : ${applicants}">
+                            <td>
+                                <strong th:text="${a.student.user.fullName}">Name</strong><br>
+                                <span class="hint" th:text="${a.student.user.email}">email</span>
+                            </td>
+                            <td th:text="${a.student.rollNo}">Roll</td>
+                            <td th:text="${a.student.branch.name()}">CSE</td>
+                            <td th:text="${a.student.cgpa}">8.0</td>
+                            <td><span class="badge" th:classappend="'status-' + ${a.status}" th:text="${a.status.label}">Status</span></td>
+                            <td>
+                                <span class="badge status-SELECTED"
+                                      th:if="${results.containsKey(a.id) and results.get(a.id).name() == 'PASSED'}">Passed</span>
+                                <span class="badge status-REJECTED"
+                                      th:if="${results.containsKey(a.id) and results.get(a.id).name() == 'FAILED'}">Failed</span>
+                                <span class="hint" th:unless="${results.containsKey(a.id)}">Pending</span>
+                            </td>
+                            <td>
+                                <div class="inline-form" th:if="${a.status.name() == 'SHORTLISTED'}">
+                                    <form th:action="@{/recruiter/drives/{d}/rounds/{r}/results/{a}(d=${drive.id}, r=${round.id}, a=${a.id})}" method="post" class="inline-form">
+                                        <input type="hidden" name="outcome" value="PASSED">
+                                        <button type="submit" class="btn btn-sm btn-mint">Pass</button>
+                                    </form>
+                                    <form th:action="@{/recruiter/drives/{d}/rounds/{r}/results/{a}(d=${drive.id}, r=${round.id}, a=${a.id})}" method="post" class="inline-form">
+                                        <input type="hidden" name="outcome" value="FAILED">
+                                        <button type="submit" class="btn btn-sm btn-danger">Fail</button>
+                                    </form>
+                                </div>
+                                <span class="hint" th:unless="${a.status.name() == 'SHORTLISTED'}">Final</span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

@@ -230,3 +230,11 @@ textarea.input { min-height: 120px; resize: vertical; line-height: 1.5; }
 }
 .round-info { display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
 .round-info strong { font-size: 15px; }
+
+/* ===== Round results (Step 12) ===== */
+.round-result {
+    margin-left: auto;
+    align-self: center;
+    text-align: right;
+    white-space: nowrap;
+}

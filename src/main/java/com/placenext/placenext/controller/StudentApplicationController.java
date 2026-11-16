@@ -9,6 +9,7 @@ import com.placenext.placenext.repository.StudentProfileRepository;
 import com.placenext.placenext.repository.UserRepository;
 import com.placenext.placenext.service.ApplicationService;
 import com.placenext.placenext.service.DriveService;
+import com.placenext.placenext.service.RoundResultService;
 import com.placenext.placenext.service.RoundService;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -30,17 +31,20 @@ public class StudentApplicationController {
     private final DriveService driveService;
     private final ApplicationService applicationService;
     private final RoundService roundService;
+    private final RoundResultService roundResultService;
 
     public StudentApplicationController(UserRepository userRepository,
                                         StudentProfileRepository studentProfileRepository,
                                         DriveService driveService,
                                         ApplicationService applicationService,
-                                        RoundService roundService) {
+                                        RoundService roundService,
+                                        RoundResultService roundResultService) {
         this.userRepository = userRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.driveService = driveService;
         this.applicationService = applicationService;
         this.roundService = roundService;
+        this.roundResultService = roundResultService;
     }
 
     @GetMapping("/student/applications")
@@ -60,6 +64,7 @@ public class StudentApplicationController {
 
         model.addAttribute("applications", applications);
         model.addAttribute("rounds", rounds);
+        model.addAttribute("results", roundResultService.forApplications(applications));
         return "student/applications";
     }
 
