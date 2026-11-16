@@ -3,6 +3,7 @@ package com.placenext.placenext.service;
 import com.placenext.placenext.model.Application;
 import com.placenext.placenext.model.ApplicationStatus;
 import com.placenext.placenext.model.Drive;
+import com.placenext.placenext.model.OfferStatus;
 import com.placenext.placenext.model.StudentProfile;
 import com.placenext.placenext.repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
@@ -16,9 +17,12 @@ import java.util.Optional;
 public class ApplicantService {
 
     private final ApplicationRepository applicationRepository;
+    private final EmailService emailService;
 
-    public ApplicantService(ApplicationRepository applicationRepository) {
+    public ApplicantService(ApplicationRepository applicationRepository,
+                            EmailService emailService) {
         this.applicationRepository = applicationRepository;
+        this.emailService = emailService;
     }
 
     public List<Application> applicants(Drive drive, ApplicationStatus status, Double minCgpa) {
@@ -51,9 +55,62 @@ public class ApplicantService {
             throw new IllegalArgumentException(
                     "Can't move an application from " + current.getLabel() + " to " + target.getLabel() + ".");
         }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (target == ApplicationStatus.SELECTED) {
+            if (applicationRepository.existsByStudentAndOfferStatus(app.getStudent(), OfferStatus.ACCEPTED)) {
+                throw new IllegalArgumentException(
+                        "This student has already accepted another offer and is placed.");
+            }
+            app.setOfferStatus(OfferStatus.PENDING);
+            app.setOfferAt(now);
+        }
+
         app.setStatus(target);
-        app.setUpdatedAt(LocalDateTime.now());
+        app.setUpdatedAt(now);
         applicationRepository.save(app);
+
+        notifyStudent(app, target);
+    }
+
+    /** Builds the email text here (inside the DB session) and hands plain Strings to EmailService. */
+    private void notifyStudent(Application app, ApplicationStatus target) {
+        StudentProfile s = app.getStudent();
+        Drive d = app.getDrive();
+        String to = s.getUser().getEmail();
+        String name = s.getUser().getFullName();
+        String company = d.getCompanyName();
+
+        String subject;
+        String body;
+        switch (target) {
+            case SHORTLISTED -> {
+                subject = "You've been shortlisted by " + company;
+                body = "Hi " + name + ",\n\n"
+                        + "Good news! You have been shortlisted for the " + company + " drive.\n"
+                        + "Log in to PlaceNext and open My Applications to see the upcoming rounds.";
+            }
+            case SELECTED -> {
+                subject = "Offer from " + company + "!";
+                body = "Hi " + name + ",\n\n"
+                        + "Congratulations! " + company + " has selected you.\n"
+                        + "Package: " + d.getCompensation() + "\n\n"
+                        + "Please log in to PlaceNext and Accept or Decline the offer from My Applications.\n"
+                        + "Note: accepting an offer marks you as placed.";
+            }
+            case REJECTED -> {
+                subject = "Update on your " + company + " application";
+                body = "Hi " + name + ",\n\n"
+                        + "Thank you for applying to " + company + ". Unfortunately, you have not been "
+                        + "selected to move forward this time.\n"
+                        + "Keep an eye on PlaceNext for other drives you are eligible for. All the best!";
+            }
+            default -> {
+                return;
+            }
+        }
+        emailService.send(to, subject, body);
     }
 
     public String toCsv(List<Application> applications) {

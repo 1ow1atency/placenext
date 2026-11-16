@@ -20,11 +20,14 @@ public class RoundResultService {
 
     private final RoundResultRepository roundResultRepository;
     private final ApplicationRepository applicationRepository;
+    private final EmailService emailService;
 
     public RoundResultService(RoundResultRepository roundResultRepository,
-                              ApplicationRepository applicationRepository) {
+                              ApplicationRepository applicationRepository,
+                              EmailService emailService) {
         this.roundResultRepository = roundResultRepository;
         this.applicationRepository = applicationRepository;
+        this.emailService = emailService;
     }
 
     /** appId -> outcome, for one round (used on the recruiter results page). */
@@ -68,18 +71,50 @@ public class RoundResultService {
                     r.setApplication(application);
                     return r;
                 });
+
+        // Only email when the outcome actually changes (clicking "Passed" twice sends one email)
+        boolean changed = result.getOutcome() != outcome;
+
+        LocalDateTime now = LocalDateTime.now();
         result.setOutcome(outcome);
-        result.setUpdatedAt(LocalDateTime.now());
+        result.setUpdatedAt(now);
         roundResultRepository.save(result);
 
         if (outcome == RoundOutcome.FAILED) {
             application.setStatus(ApplicationStatus.REJECTED);
+            application.setUpdatedAt(now);
             applicationRepository.save(application);
+        }
+
+        if (changed) {
+            notifyStudent(application, outcome);
         }
     }
 
     @Transactional
     public void deleteForRound(Round round) {
         roundResultRepository.deleteByRound(round);
+    }
+
+    /** Builds the email text here (inside the DB session) and hands plain Strings to EmailService. */
+    private void notifyStudent(Application app, RoundOutcome outcome) {
+        String to = app.getStudent().getUser().getEmail();
+        String name = app.getStudent().getUser().getFullName();
+        String company = app.getDrive().getCompanyName();
+
+        if (outcome == RoundOutcome.PASSED) {
+            emailService.send(to,
+                    "You cleared a round at " + company,
+                    "Hi " + name + ",\n\n"
+                            + "Well done! You have passed a selection round for the " + company + " drive.\n"
+                            + "Log in to PlaceNext and open My Applications to see your progress and the next round.");
+        } else {
+            emailService.send(to,
+                    "Update on your " + company + " application",
+                    "Hi " + name + ",\n\n"
+                            + "Thank you for taking part in the " + company + " selection process. "
+                            + "Unfortunately, you did not clear this round, so your application has been closed.\n"
+                            + "Keep an eye on PlaceNext for other drives you are eligible for. All the best!");
+        }
     }
 }

@@ -18,9 +18,12 @@ import java.util.Optional;
 public class DriveService {
 
     private final DriveRepository driveRepository;
+    private final EmailService emailService;
 
-    public DriveService(DriveRepository driveRepository) {
+    public DriveService(DriveRepository driveRepository,
+                        EmailService emailService) {
         this.driveRepository = driveRepository;
+        this.emailService = emailService;
     }
 
     // ---------- Recruiter ----------
@@ -75,15 +78,37 @@ public class DriveService {
     @Transactional
     public void approve(Long id) {
         Drive drive = driveRepository.findById(id).orElseThrow();
+        boolean changed = drive.getStatus() != DriveStatus.APPROVED;
         drive.setStatus(DriveStatus.APPROVED);
         drive.setRejectionReason(null);
+
+        if (changed) {
+            emailService.send(recruiterEmail(drive),
+                    "Your drive \"" + drive.getTitle() + "\" is approved",
+                    "Hi " + recruiterName(drive) + ",\n\n"
+                            + "Your drive \"" + drive.getTitle() + "\" has been approved by the placement office "
+                            + "and is now visible to eligible students.\n"
+                            + "Application deadline: " + drive.getDeadline() + "\n\n"
+                            + "You can track applicants from your PlaceNext dashboard.");
+        }
     }
 
     @Transactional
     public void reject(Long id, String reason) {
         Drive drive = driveRepository.findById(id).orElseThrow();
+        boolean changed = drive.getStatus() != DriveStatus.REJECTED;
+        String cleanReason = blankToNull(reason);
         drive.setStatus(DriveStatus.REJECTED);
-        drive.setRejectionReason(blankToNull(reason));
+        drive.setRejectionReason(cleanReason);
+
+        if (changed) {
+            emailService.send(recruiterEmail(drive),
+                    "Your drive \"" + drive.getTitle() + "\" was not approved",
+                    "Hi " + recruiterName(drive) + ",\n\n"
+                            + "Your drive \"" + drive.getTitle() + "\" was not approved by the placement office.\n"
+                            + "Reason: " + (cleanReason == null ? "No reason given." : cleanReason) + "\n\n"
+                            + "You can post a corrected drive from your PlaceNext dashboard.");
+        }
     }
 
     // ---------- Students ----------
@@ -94,6 +119,15 @@ public class DriveService {
 
     public Optional<Drive> findById(Long id) {
         return driveRepository.findById(id);
+    }
+
+    // ---------- Helpers ----------
+    private String recruiterEmail(Drive drive) {
+        return drive.getRecruiter().getUser().getEmail();
+    }
+
+    private String recruiterName(Drive drive) {
+        return drive.getRecruiter().getUser().getFullName();
     }
 
     private String blankToNull(String s) {
