@@ -45,7 +45,7 @@
         <a th:href="@{/admin/recruiters}" th:classappend="${active == 'recruiters'} ? 'active'">Recruiters</a>
         <a th:href="@{/admin/students}" th:classappend="${active == 'students'} ? 'active'">Students</a>
         <a th:href="@{/admin/placements}" th:classappend="${active == 'placements'} ? 'active'">Placements</a>
-        <a href="#">Reports <span class="soon">SOON</span></a>
+        <a th:href="@{/admin/reports}" th:classappend="${active == 'reports'} ? 'active'">Reports</a>
     </th:block>
 </nav>
 

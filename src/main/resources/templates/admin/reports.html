@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Reports')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('reports', 'ADMIN')}"></nav>
+    <main class="main">
+
+        <div class="page-head">
+            <div class="page-title">
+                <h1>Reports</h1>
+                <p>Placement statistics for this season</p>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat mint"><div class="stat-label">Students placed</div>
+                <div class="stat-value" th:text="${report.totalPlaced} + ' / ' + ${report.totalStudents}">0 / 0</div></div>
+            <div class="stat yellow"><div class="stat-label">Placement rate</div>
+                <div class="stat-value" th:text="${report.overallPercent} + '%'">0%</div></div>
+            <div class="stat"><div class="stat-label">Full-time offers</div>
+                <div class="stat-value" th:text="${report.fullTimeOffers}">0</div></div>
+            <div class="stat"><div class="stat-label">Internship offers</div>
+                <div class="stat-value" th:text="${report.internshipOffers}">0</div></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat mint"><div class="stat-label">Highest package</div>
+                <div class="stat-value" th:text="${report.highestLpa != null} ? ${report.highestLpa} + ' LPA' : '—'">—</div></div>
+            <div class="stat yellow"><div class="stat-label">Average package</div>
+                <div class="stat-value" th:text="${report.averageLpa != null} ? ${report.averageLpa} + ' LPA' : '—'">—</div></div>
+            <div class="stat"><div class="stat-label">Lowest package</div>
+                <div class="stat-value" th:text="${report.lowestLpa != null} ? ${report.lowestLpa} + ' LPA' : '—'">—</div></div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar pink"><span>BRANCH_WISE.DAT</span></div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(report.branches)}">
+                    <div class="empty-icon">📊</div>
+                    <strong>No students yet</strong>
+                </div>
+                <div class="table-wrap" th:unless="${#lists.isEmpty(report.branches)}">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Branch</th><th>Students</th><th>Placed</th><th>Placement rate</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="b : ${report.branches}">
+                            <td><strong th:text="${b.branch}">CSE</strong></td>
+                            <td th:text="${b.total}">0</td>
+                            <td th:text="${b.placed}">0</td>
+                            <td th:text="${b.percent} + '%'">0%</td>
+                            <td class="bar-cell">
+                                <div class="bar"><div class="bar-fill" th:style="'width:' + ${b.percent} + '%'"></div></div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar yellow"><span>COMPANY_WISE.DAT</span></div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(report.companies)}">
+                    <div class="empty-icon">🏢</div>
+                    <strong>No placements yet</strong>
+                    <p>Companies appear here once students accept offers.</p>
+                </div>
+                <div class="table-wrap" th:unless="${#lists.isEmpty(report.companies)}">
+                    <table class="table">
+                        <thead>
+                        <tr><th>Company</th><th>Students hired</th><th>Average package (full-time)</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c : ${report.companies}">
+                            <td><strong th:text="${c.company}">Company</strong></td>
+                            <td th:text="${c.hires}">0</td>
+                            <td th:text="${c.averageLpa != null} ? ${c.averageLpa} + ' LPA' : '—'">—</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

@@ -259,3 +259,20 @@ textarea.input { min-height: 120px; resize: vertical; line-height: 1.5; }
 
 /* ===== Admin dashboard and students (Step 14) ===== */
 .window-bar.pink { background: var(--pink); }
+
+/* ===== Reports (Step 15) ===== */
+.bar-cell { min-width: 160px; }
+.bar {
+    height: 14px;
+    background: #fff;
+    border: 2px solid var(--plum);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.bar-fill {
+    height: 100%;
+    background: var(--mint);
+    border-right: 2px solid var(--plum);
+    min-width: 0;
+}
+.bar-fill[style*="width:0%"] { border-right: 0; }
