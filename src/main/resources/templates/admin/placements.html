@@ -12,6 +12,7 @@
                 <h1>Placements</h1>
                 <p th:text="${#lists.size(placements)} + ' student(s) placed so far'">0 students placed</p>
             </div>
+            <a class="btn btn-mint" th:href="@{/admin/export/placements}">⬇ Download CSV</a>
         </div>
 
         <div class="window">
