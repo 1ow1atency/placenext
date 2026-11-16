@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: pageHead('Placements')}"></head>
+<body>
+<header th:replace="~{fragments :: statusbar}"></header>
+<div class="shell">
+    <nav th:replace="~{fragments :: sidenav('placements', 'ADMIN')}"></nav>
+    <main class="main">
+
+        <div class="page-head">
+            <div class="page-title">
+                <h1>Placements</h1>
+                <p th:text="${#lists.size(placements)} + ' student(s) placed so far'">0 students placed</p>
+            </div>
+        </div>
+
+        <div class="window">
+            <div class="window-bar mint">
+                <span>PLACED_STUDENTS.DAT</span>
+                <span class="badge" th:text="${#lists.size(placements)} + ' placed'">0 placed</span>
+            </div>
+            <div class="window-body">
+                <div class="empty" th:if="${#lists.isEmpty(placements)}">
+                    <div class="empty-icon">🎓</div>
+                    <strong>No placements yet</strong>
+                    <p>Students appear here once they accept an offer.</p>
+                </div>
+
+                <div class="table-wrap" th:unless="${#lists.isEmpty(placements)}">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>Student</th><th>Roll no</th><th>Branch</th><th>CGPA</th>
+                            <th>Company</th><th>Role</th><th>Package</th><th>Accepted on</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="p : ${placements}">
+                            <td>
+                                <strong th:text="${p.student.user.fullName}">Name</strong><br>
+                                <span class="hint" th:text="${p.student.user.email}">email</span>
+                            </td>
+                            <td th:text="${p.student.rollNo}">Roll</td>
+                            <td th:text="${p.student.branch.name()}">CSE</td>
+                            <td th:text="${p.student.cgpa}">8.0</td>
+                            <td th:text="${p.drive.companyName}">Company</td>
+                            <td th:text="${p.drive.title}">Role</td>
+                            <td th:text="${p.drive.compensation}">Package</td>
+                            <td th:text="${p.respondedAt != null} ? ${#temporals.format(p.respondedAt, 'dd MMM yyyy')} : '—'">Date</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+</body>
+</html>

@@ -45,6 +45,35 @@
                     <span>🗓 Applied <strong th:text="${#temporals.format(a.appliedAt, 'dd MMM yyyy')}">date</strong></span>
                 </div>
 
+                <!-- Offer: shown once the recruiter has selected the student -->
+                <div class="offer-box offer-pending" th:if="${a.offerPending}">
+                    <p class="offer-title">🎉 You have an offer!</p>
+                    <p class="offer-text"
+                       th:text="${a.drive.companyName} + ' has selected you for ' + ${a.drive.title} + ' (' + ${a.drive.compensation} + '). Accept to confirm your placement, or decline to keep looking.'">Offer</p>
+                    <p class="offer-warn">Accepting withdraws your other open applications and you will not be able to apply to more drives.</p>
+                    <div class="form-actions">
+                        <form th:action="@{/student/offers/{id}/accept(id=${a.id})}" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-mint"
+                                    onclick="return confirm('Accept this offer? This is final.')">Accept offer</button>
+                        </form>
+                        <form th:action="@{/student/offers/{id}/decline(id=${a.id})}" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                    onclick="return confirm('Decline this offer?')">Decline</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="offer-box offer-accepted" th:if="${a.offerAccepted}">
+                    <p class="offer-title">✅ Offer accepted. You are placed!</p>
+                    <p class="offer-text"
+                       th:text="${a.respondedAt != null} ? 'Accepted on ' + ${#temporals.format(a.respondedAt, 'dd MMM yyyy')} + '.' : 'Offer accepted.'">Accepted</p>
+                </div>
+
+                <div class="offer-box offer-declined" th:if="${a.offerDeclined}">
+                    <p class="offer-title">Offer declined</p>
+                    <p class="offer-text">You declined this offer.</p>
+                </div>
+
                 <!-- Rounds: shortlisted / selected, or rejected after at least one round result -->
                 <div class="round-list"
                      th:if="${(a.status.name() == 'SHORTLISTED' or a.status.name() == 'SELECTED' or (a.status.name() == 'REJECTED' and !results.get(a.id).isEmpty())) and rounds.get(a.drive.id) != null and !rounds.get(a.drive.id).isEmpty()}">
@@ -72,7 +101,7 @@
                 <div class="note"
                      th:if="${a.status.name() == 'APPLIED'}">Waiting for the recruiter to review your application. Rounds appear here once you are shortlisted.</div>
 
-                <div class="form-actions" th:if="${a.status.name() == 'APPLIED' or a.status.name() == 'SHORTLISTED'}">
+                <div class="form-actions" th:if="${a.status.name() == 'APPLIED'}">
                     <a class="btn btn-sm" th:href="@{/student/drives/{id}(id=${a.drive.id})}">View drive</a>
                     <form th:action="@{/student/applications/{id}/withdraw(id=${a.id})}" method="post" style="display:inline">
                         <button type="submit" class="btn btn-sm btn-danger"

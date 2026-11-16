@@ -2,6 +2,7 @@ package com.placenext.placenext.controller;
 
 import com.placenext.placenext.dto.DriveEligibility;
 import com.placenext.placenext.model.*;
+import com.placenext.placenext.repository.ApplicationRepository;
 import com.placenext.placenext.repository.RecruiterProfileRepository;
 import com.placenext.placenext.repository.StudentProfileRepository;
 import com.placenext.placenext.repository.UserRepository;
@@ -24,19 +25,22 @@ public class DashboardController {
     private final DriveService driveService;
     private final EligibilityService eligibilityService;
     private final ApplicationService applicationService;
+    private final ApplicationRepository applicationRepository;
 
     public DashboardController(UserRepository userRepository,
                                StudentProfileRepository studentProfileRepository,
                                RecruiterProfileRepository recruiterProfileRepository,
                                DriveService driveService,
                                EligibilityService eligibilityService,
-                               ApplicationService applicationService) {
+                               ApplicationService applicationService,
+                               ApplicationRepository applicationRepository) {
         this.userRepository = userRepository;
         this.studentProfileRepository = studentProfileRepository;
         this.recruiterProfileRepository = recruiterProfileRepository;
         this.driveService = driveService;
         this.eligibilityService = eligibilityService;
         this.applicationService = applicationService;
+        this.applicationRepository = applicationRepository;
     }
 
     @GetMapping("/student/dashboard")
@@ -48,11 +52,15 @@ public class DashboardController {
                 .stream().filter(DriveEligibility::isEligible).toList();
 
         long applications = 0, shortlisted = 0, offers = 0;
+        boolean placed = false;
         if (profile != null) {
             applications = applicationService.countForStudent(profile)
                     - applicationService.countForStudent(profile, ApplicationStatus.WITHDRAWN);
             shortlisted = applicationService.countForStudent(profile, ApplicationStatus.SHORTLISTED);
-            offers = applicationService.countForStudent(profile, ApplicationStatus.SELECTED);
+            // Offers the student still holds: waiting for an answer, or accepted
+            List<Application> mine = applicationService.forStudent(profile);
+            offers = mine.stream().filter(a -> a.isOfferPending() || a.isOfferAccepted()).count();
+            placed = mine.stream().anyMatch(Application::isOfferAccepted);
         }
 
         model.addAttribute("user", user);
@@ -62,6 +70,7 @@ public class DashboardController {
         model.addAttribute("applicationCount", applications);
         model.addAttribute("shortlistedCount", shortlisted);
         model.addAttribute("offerCount", offers);
+        model.addAttribute("placed", placed);
         model.addAttribute("upcoming", eligible.stream().limit(3).toList());
         return "student/dashboard";
     }
@@ -94,6 +103,7 @@ public class DashboardController {
         model.addAttribute("recruiterCount", userRepository.countByRole(Role.RECRUITER));
         model.addAttribute("driveCount", driveService.countAll());
         model.addAttribute("pendingCount", pending.size());
+        model.addAttribute("placedCount", applicationRepository.countByOfferStatus(OfferStatus.ACCEPTED));
         model.addAttribute("pendingDrives", pending.stream().limit(5).toList());
         return "admin/dashboard";
     }

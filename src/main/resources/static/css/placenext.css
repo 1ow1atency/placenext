@@ -238,3 +238,21 @@ textarea.input { min-height: 120px; resize: vertical; line-height: 1.5; }
     text-align: right;
     white-space: nowrap;
 }
+
+/* ===== Offers (Step 13) ===== */
+.offer-box {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border: 2px solid var(--plum);
+    border-radius: 12px;
+    background: #fff;
+}
+.offer-box.offer-pending {
+    background: var(--yellow);
+    box-shadow: 3px 3px 0 var(--plum);
+}
+.offer-box.offer-accepted { background: var(--mint); }
+.offer-box.offer-declined { opacity: .7; }
+.offer-title { font-weight: 800; margin: 0 0 4px; }
+.offer-text { margin: 0 0 6px; font-size: 14px; }
+.offer-warn { margin: 0 0 10px; font-size: 12px; opacity: .8; }

@@ -24,6 +24,10 @@ public class ApplicationService {
     /** Applies to a drive. Throws IllegalArgumentException with a friendly message if not allowed. */
     @Transactional
     public Application apply(StudentProfile student, Drive drive) {
+        if (applicationRepository.existsByStudentAndOfferStatus(student, OfferStatus.ACCEPTED)) {
+            throw new IllegalArgumentException(
+                    "You have already accepted an offer and are placed, so you can't apply to more drives.");
+        }
         if (drive.getStatus() != DriveStatus.APPROVED) {
             throw new IllegalArgumentException("This drive is not open for applications.");
         }

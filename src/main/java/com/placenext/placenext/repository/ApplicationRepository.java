@@ -3,6 +3,7 @@ package com.placenext.placenext.repository;
 import com.placenext.placenext.model.Application;
 import com.placenext.placenext.model.ApplicationStatus;
 import com.placenext.placenext.model.Drive;
+import com.placenext.placenext.model.OfferStatus;
 import com.placenext.placenext.model.StudentProfile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -26,4 +27,11 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
     long countByDrive(Drive drive);
 
     long countByDriveAndStatusNot(Drive drive, ApplicationStatus status);
+
+    // Placement (Step 13)
+    boolean existsByStudentAndOfferStatus(StudentProfile student, OfferStatus offerStatus);
+
+    List<Application> findByOfferStatusOrderByRespondedAtDesc(OfferStatus offerStatus);
+
+    long countByOfferStatus(OfferStatus offerStatus);
 }
