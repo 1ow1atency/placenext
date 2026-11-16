@@ -31,4 +31,19 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### PlaceNext ###
+# Student resumes uploaded through the app (personal data)
 uploads/
+
+# Local secrets (DB / mail passwords) – never commit these
+.env
+*.env
+application-local.properties
+
+# Logs
+*.log
+logs/
+
+### macOS ###
+.DS_Store
