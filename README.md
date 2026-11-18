@@ -159,3 +159,5 @@ Then open **http://localhost:8080**. Tables are created automatically on first s
 ## Team
 - **Ali Ekram**: [@1ow1atency](https://github.com/1ow1atency)
 - **Ishan Jha**
+
+**🌐 Live demo:** https://placenext-production.up.railway.app
